@@ -32,6 +32,7 @@ This file follows Semantic Versioning and records meaningful changes to the shar
 - `Documentation Guidelines` prompt model updated to `GPT-5.4 (copilot)`.
 - `README.md`, asset catalog, and VS Code consumption guide updated to reflect the deploy system, documentation stewardship workflow, and session tracking.
 - `scripts/install-vscode-assets.sh` marked deprecated in favor of `scripts/deploy-to-project.sh`.
+- Canonical submodule path renamed from `.config/universal-ide-agents/` to `.githubconfig/universal-ide-agents/` to avoid collision with `.config/` directories commonly used by Python, Node.js, and other project toolchains. Updated in `README.md`, `docs/vscode-consumption.md`, and the `deploy-to-project.sh` usage block.
 
 ### Fixed
 

@@ -75,24 +75,24 @@ flowchart LR
 
 ## Quick Start
 
-The recommended integration path is: keep this repository as a Git submodule at `.config/universal-ide-agents/`, then use `deploy-to-project.sh` to copy the shared assets into the target workspace.
+The recommended integration path is: keep this repository as a Git submodule at `.githubconfig/universal-ide-agents/`, then use `deploy-to-project.sh` to copy the shared assets into the target workspace.
 
 ```bash
-git submodule add git@github.com:Sebastian93BC/universal-ide-agents.git .config/universal-ide-agents
-./.config/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
+git submodule add git@github.com:Sebastian93BC/universal-ide-agents.git .githubconfig/universal-ide-agents
+./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
 ```
 
 Preview changes without writing any files:
 
 ```bash
-./.config/universal-ide-agents/scripts/deploy-to-project.sh --dry-run "$PWD"
+./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --dry-run "$PWD"
 ```
 
 Update the submodule to `main` and redeploy, removing any files that were deleted from the source:
 
 ```bash
 git submodule update --remote --merge
-./.config/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
+./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
 ```
 
 ## Editorial View

@@ -4,7 +4,7 @@ This repository is designed to be consumed as a secondary configuration source f
 
 ## Recommended model
 
-Keep this repository as a Git submodule at `.config/universal-ide-agents/` and use `deploy-to-project.sh` to copy the shared assets into the consumer project. The deploy script handles the full path mapping, overwrites managed files on every run, and keeps consumer-owned files untouched.
+Keep this repository as a Git submodule at `.githubconfig/universal-ide-agents/` and use `deploy-to-project.sh` to copy the shared assets into the consumer project. The deploy script handles the full path mapping, overwrites managed files on every run, and keeps consumer-owned files untouched.
 
 Why this model:
 - The shared source stays versioned and auditable.
@@ -55,13 +55,13 @@ target-project/
 Add the submodule:
 
 ```bash
-git submodule add git@github.com:Sebastian93BC/universal-ide-agents.git .config/universal-ide-agents
+git submodule add git@github.com:Sebastian93BC/universal-ide-agents.git .githubconfig/universal-ide-agents
 ```
 
 Deploy assets to the current project:
 
 ```bash
-./.config/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
+./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
 ```
 
 ## Ongoing updates
@@ -70,7 +70,7 @@ Pull the latest changes from the shared source and redeploy:
 
 ```bash
 git submodule update --remote --merge
-./.config/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
+./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
 ```
 
 Use `--clean` to also remove files that were deleted from the source since the last deploy.
@@ -85,7 +85,7 @@ Use `--clean` to also remove files that were deleted from the source since the l
 Preview what would happen before committing:
 
 ```bash
-./.config/universal-ide-agents/scripts/deploy-to-project.sh --dry-run "$PWD"
+./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --dry-run "$PWD"
 ```
 
 ## What is not touched

@@ -36,24 +36,24 @@ Options:
 
 If no target directory is provided, the current working directory is used.
 
-Typical workflow (submodule at .config/universal-ide-agents/):
+Typical workflow (submodule at .githubconfig/universal-ide-agents/):
 
   # First-time setup
   git submodule add git@github.com:Sebastian93BC/universal-ide-agents.git \
-    .config/universal-ide-agents
+    .githubconfig/universal-ide-agents
 
   # Deploy assets
-  .config/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
+  .githubconfig/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
 
   # Preview without writing
-  .config/universal-ide-agents/scripts/deploy-to-project.sh --dry-run "$PWD"
+  .githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --dry-run "$PWD"
 
   # Remove obsolete agent files and redeploy
-  .config/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
+  .githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
 
   # Update the submodule to the latest main, then redeploy
   git submodule update --remote --merge
-  .config/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
+  .githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
 EOF
 }
 
