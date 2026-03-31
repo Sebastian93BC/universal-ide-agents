@@ -93,6 +93,16 @@ Use `--dry-run` to preview changes and `--force` if you want the shared version 
 
 ### Latest Entry
 
+#### March 31, 2026
+
+The agent layer received a significant evolution:
+
+- `Planner` now runs an `Explore` subagent for codebase research, follows a four-phase workflow, persists plans to sessions, and hands off to `Implementer`
+- `Implementer` reads approved plans from session memory, logs progress to session folders, and has expanded tool access
+- `Feature Builder` gained session tracking (slug generation, index logging) and integrates `Documentation Steward` before review
+- Session infrastructure (`.github/sessions/`) provides historical context across delivery cycles
+- `Documentation Steward` keeps README, changelog, and license-sensitive documentation aligned after each change
+
 #### March 27, 2026
 
 The repository launches as a clean VS Code asset hub with:
@@ -112,6 +122,7 @@ The repository launches as a clean VS Code asset hub with:
 │   ├── hooks/
 │   ├── instructions/
 │   ├── prompts/
+│   ├── sessions/
 │   ├── skills/
 │   └── copilot-instructions.md
 ├── docs/
@@ -132,6 +143,17 @@ The repository launches as a clean VS Code asset hub with:
 - [VS Code consumption guide](./docs/vscode-consumption.md)
 - [Roadmap](./docs/roadmap.md)
 - [Changelog](./CHANGELOG.md)
+
+## Core Agent Flows
+
+The shared agent layer currently covers:
+
+- `Planner` for codebase research, structured plan design, and session persistence
+- `Plan Architect` for validating plans against repository patterns and constraints
+- `Implementer` for plan-driven execution with session logging and expanded tool access
+- `Documentation Steward` for source-control-aware updates to `README.md`, `CHANGELOG.md`, and conditional `LICENSE` maintenance
+- `Reviewer` for final quality, safety, and maintainability review
+- `Feature Builder` for orchestration across planning, architecture validation, implementation, documentation sync, review, and session tracking
 
 ## Versioning
 

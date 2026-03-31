@@ -1,7 +1,7 @@
 ---
 name: Plan Architect
 description: Validate implementation plans against repository patterns, reusable assets, and VS Code customization constraints.
-user-invokable: false
+user-invocable: false
 tools: ['read', 'search']
 ---
 Validate implementation plans before coding starts.

@@ -8,6 +8,25 @@ This file follows Semantic Versioning and records meaningful changes to the shar
 
 ---
 
+## Unreleased
+
+### Added in Unreleased
+
+- `Documentation Steward` agent for source-control-aware updates to `README.md`, `CHANGELOG.md`, and conditional `LICENSE` maintenance.
+- Session tracking infrastructure under `.github/sessions/` with an `index.md` trace file for historical context across Feature Builder runs.
+
+### Changed in Unreleased
+
+- `Planner` reworked: added `Explore` subagent for codebase research, structured four-phase workflow (Discovery → Alignment → Design → Refinement), session persistence to `.github/sessions/{slug}/plan.md` and `/memories/session/plan.md`, plan style guide, and handoff to `Implementer`.
+- `Implementer` reworked: now reads the approved plan from session memory, logs progress to `.github/sessions/{slug}/implementation.md`, and includes expanded tools (web, terminal, memory, GitHub issue/PR access).
+- `Feature Builder` expanded to a nine-step workflow with session slug generation (step 0), `Documentation Steward` integration (step 6), and session index logging (step 9). Added `edit` tool.
+- `Documentation Guidelines` prompt model updated to `GPT-5.4 (copilot)`.
+- `README.md` and asset catalog updated to reflect the documentation stewardship workflow and session tracking.
+
+### Fixed in Unreleased
+
+- Corrected `user-invokable` → `user-invocable` in frontmatter of `Feature Builder`, `Plan Architect`, and `Reviewer` agents.
+
 ## 0.1.0 · 2026-03-27
 
 <div>

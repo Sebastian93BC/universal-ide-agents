@@ -1,0 +1,102 @@
+### FASE 2 — Versioning + Reviewer/Code Reviewer *(paralelas, independientes entre sí)*
+
+5. **Nueva instrucción de convenciones de versiones y tags**
+   - Archivo: `.github/instructions/Versioning.instructions.md` con `applyTo: "CHANGELOG.md"`
+   - Contenido: cuándo una change es patch / minor / major, formato de tag `vMAJOR.MINOR.PATCH`, regla de `Unreleased`, cómo redactar entradas de changelog
+   - Opción alternativa más ligera: prompt `.github/prompts/Version Bump.prompt.md` para uso on-demand — **recomendación: instrucción, porque aplica pasivamente cada vez que alguien edita el changelog**
+
+6. **Mejorar Reviewer.agent.md** para absorber la superficie de code review
+   - El `Reviewer` actual cubre assets VS Code (frontmatter, portabilidad, workflow safety). El `Code Reviewer` propuesto cubre calidad de código, OWASP, patrones, accesibilidad. Los dominios son distintos → **mantenerlos separados**
+   - Crear `.github/agents/Code Reviewer.agent.md` con `user-invocable: true`, severity model con emojis, y guardar hallazgos como archivo opcional
+   - Añadirlo al `agents` list de `Feature Builder` como paso optativo de revisión de código (después del `Reviewer` de assets)
+   - Añadir `web` al tool set de `Reviewer` si no está ya
+
+---
+
+### FASE 3 — Nuevos agentes y hooks *(dependen de Fase 1 y 2 pero no entre sí)*
+
+7. **Nuevo agente `Scientific Paper Research.agent.md`**
+   - Requiere que el usuario tenga el MCP server `bgpt` configurado — documentar esa precondición en el frontmatter con `mcp-servers`
+   - No se puede usar sin el servidor externo; el agente debería indicar eso si el tool no responde
+
+8. **Expansión de hooks**
+   - Añadir hook `on_complete` en context.json que invoque un script `save-session-output.sh` (por crear) para persistir resultados costosos (planes, reviews) — el script leerá variables de contexto si están disponibles
+   - Documentar los tipos de hook disponibles en el roadmap con recetas simples
+
+---
+
+### Relevant files
+
+- `.github/agents/Feature Builder.agent.md` — colapsar `Implementer`, añadir `Code Reviewer`
+- Planner.agent.md — hardening de reglas y persistencia de planes
+- Implementer.agent.md — **eliminar**
+- Reviewer.agent.md — revisión para alinear scope
+- `.github/agents/Code Reviewer.agent.md` — **nuevo**
+- `.github/agents/Scientific Paper Research.agent.md` — **nuevo**
+- `.github/instructions/Versioning.instructions.md` — **nuevo**
+- context.json — añadir `on_complete`
+- `.github/plans/` — **nueva carpeta** para persistencia de planes
+- `scripts/save-session-output.sh` — **nuevo script** para el hook `on_complete`
+- asset-catalog.md — actualizar con todos los nuevos assets
+- CHANGELOG.md — registrar cambios bajo `Unreleased`
+
+---
+
+### Verification
+
+1. `Feature Builder` sigue produciendo el mismo flujo sin `Implementer` como subagente separado
+2. `Planner` genera y guarda un archivo en `.github/plans/` antes de proceder
+3. `Code Reviewer` se puede invocar directamente por el usuario y desde `Feature Builder`
+4. La instrucción de versioning se activa al editar CHANGELOG.md (verificar `applyTo`)
+5. El hook `on_complete` ejecuta el script sin fallar en worktrees sin cambios
+
+---
+
+### Decisions
+
+- **Eliminar `Implementer`**: sus reglas son tan genéricas que vivir en `Feature Builder` es más limpio
+- **Mantener `Planner`**: tiene valor diferenciado (no-edit boundary, save plan, approval gate)
+- **Dos reviewers separados**: `Reviewer` para assets VS Code, `Code Reviewer` para calidad de código — distintos dominios, distintas tools
+- **Planificación como `.github/plans/`**: carpeta versionada, alineada con la convención del repo
+- **Scientific Paper Research**: incluido pero marcado como dependiente del MCP externo
+
+---
+
+**¿Confirmamos este plan para implementar en este orden (Fase 1 → 2 → 3), o quieres ajustar algún ítem antes de arrancar?**
+
+#####################################################################################################################
+
+LLevar una bbdd de las peticiones a los agentes los plantes los cambios todo el trace del prompt con el agente y el comportamiendo y pensamientos del agente
+también almacenar consultas o tareas costosas y otras de interes
+
+ Evaluar si es necesario y cuales son los agentes invocables por el usuario, ahora tenemos Feature buidel, planner y reviewer
+
+
+
+Me gustaría que todos los planes ya sean por el agente propio de github copilot como el agente Planner guarden siempre el plan, necesitamos crear una bbdd o estrucutura de carpetas para esto
+
+
+cuando los agentes se activan podrían leer contexto
+
+
+actualmente tengo un hook
+~hooks/context.json
+
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "./scripts/inject-context.sh"
+      }
+    ]
+  }
+}
+
+
+se puede implementar un RAG dentro de las funcinalidades para que los agentes consulten trabajos anteriores?
+
+
+
+##############
+Añadir un todo en cada proyecto

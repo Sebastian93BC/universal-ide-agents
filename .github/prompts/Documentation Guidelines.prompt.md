@@ -1,7 +1,7 @@
 ---
 name: Documentation Guidelines
 description: Use when you need polished documentation for reusable VS Code agent customization repositories, guides, or asset catalogs.
-model: Claude Haiku 4.5 (copilot)
+model: GPT-5.4 (copilot)
 tools: [read, edit]
 ---
 Write documentation that is clear, precise, and easy to reuse across projects.

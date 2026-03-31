@@ -6,10 +6,11 @@ This catalog documents the reusable VS Code assets currently shipped by `univers
 
 | File | Purpose |
 | --- | --- |
-| `.github/agents/Feature Builder.agent.md` | Coordinates end-to-end feature delivery using the planning, implementation, and review agents |
-| `.github/agents/Planner.agent.md` | Produces implementation plans before edits begin |
+| `.github/agents/Feature Builder.agent.md` | Coordinates end-to-end feature delivery using planning, architecture validation, implementation, documentation sync, and review |
+| `.github/agents/Documentation Steward.agent.md` | Synchronizes README, changelog, and license-sensitive documentation from the current source control state and available worktree context |
+| `.github/agents/Planner.agent.md` | Researches the codebase via Explore subagent, designs structured plans, persists to session folders, and hands off to Implementer |
 | `.github/agents/Plan Architect.agent.md` | Validates a plan against repository patterns and constraints |
-| `.github/agents/Implementer.agent.md` | Executes approved changes with focused edits |
+| `.github/agents/Implementer.agent.md` | Executes approved plans from session memory with session logging and expanded tool access |
 | `.github/agents/Reviewer.agent.md` | Reviews changes for correctness, safety, and maintainability |
 
 ## Skills
@@ -47,6 +48,16 @@ This catalog documents the reusable VS Code assets currently shipped by `univers
 | --- | --- |
 | `scripts/install-vscode-assets.sh` | Copies shared VS Code assets into a target repository |
 | `scripts/inject-context.sh` | Prints a lightweight project snapshot that hook runners can inject into agent context |
+
+## Sessions
+
+| Path | Purpose |
+| --- | --- |
+| `.github/sessions/index.md` | Cumulative trace of all Feature Builder sessions — used as historical context by Planner and Feature Builder |
+| `.github/sessions/{slug}/query.md` | Original user request for the session |
+| `.github/sessions/{slug}/plan.md` | Approved implementation plan produced by Planner |
+| `.github/sessions/{slug}/implementation.md` | Step-by-step log of changes made by Implementer |
+| `.github/sessions/{slug}/review.md` | Reviewer findings for the session |
 
 ## Root Guidance
 

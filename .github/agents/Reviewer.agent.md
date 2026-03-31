@@ -1,7 +1,7 @@
 ---
 name: 'Reviewer'
 description: 'Review VS Code customization changes for quality, safety, maintainability, and adherence to repository guidance.'
-user-invokable: true
+user-invocable: true
 tools: ['vscode/askQuestions', 'read', 'search', 'edit', 'web']
 ---
 # Code Reviewer agent
