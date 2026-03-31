@@ -1,14 +1,67 @@
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
 .env
 .env.*
+.python-version
 .venv/
+venv/
+ENV/
+env/
+pip-wheel-metadata/
 .pytest_cache/
-__pycache__/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
 coverage/
+htmlcov/
 dist/
 build/
+*.egg-info/
+.eggs/
+*.egg
+pip-log.txt
+
+# Node / JS
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnp/
+.pnp.js
+.cache/
+.next/
+.out/
+.parcel-cache/
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs / temp
 *.log
 *.tmp
 *.swp
-.vscode/
+*~
+Thumbs.db
+
+# Misc
+.sass-cache/
+.env.local
+# Ignore local plan
+plan_improcement.md

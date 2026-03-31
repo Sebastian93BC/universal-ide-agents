@@ -10,20 +10,30 @@ This file follows Semantic Versioning and records meaningful changes to the shar
 
 ## Unreleased
 
-### Added in Unreleased
+## 0.1.1 · 2026-03-31
+
+<div>
+
+[![Release](https://img.shields.io/badge/release-0.1.1-0F766E?style=for-the-badge)](./README.md) [![Target](https://img.shields.io/badge/target-VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/) [![Stage](https://img.shields.io/badge/stage-agent%20evolution%20%26%20deploy%20system-1D4ED8?style=for-the-badge)](./docs/vscode-consumption.md)
+
+</div>
+
+### Added
 
 - `Documentation Steward` agent for source-control-aware updates to `README.md`, `CHANGELOG.md`, and conditional `LICENSE` maintenance.
 - Session tracking infrastructure under `.github/sessions/` with an `index.md` trace file for historical context across Feature Builder runs.
+- `scripts/deploy-to-project.sh` — canonical deployment script that distributes the full asset surface to consumer projects with explicit path mapping: `.github/` → `.github/`, `docs/` → `.github/docs/`, `scripts/` → `.github/scripts/`. Supports `--dry-run` to preview operations and `--clean` to remove files inside managed directories that no longer exist in the source. Automatically rewrites the hook command path in `context.json` after copying so it resolves correctly inside the consumer project. POSIX-compatible and idempotent.
 
-### Changed in Unreleased
+### Changed
 
 - `Planner` reworked: added `Explore` subagent for codebase research, structured four-phase workflow (Discovery → Alignment → Design → Refinement), session persistence to `.github/sessions/{slug}/plan.md` and `/memories/session/plan.md`, plan style guide, and handoff to `Implementer`.
 - `Implementer` reworked: now reads the approved plan from session memory, logs progress to `.github/sessions/{slug}/implementation.md`, and includes expanded tools (web, terminal, memory, GitHub issue/PR access).
 - `Feature Builder` expanded to a nine-step workflow with session slug generation (step 0), `Documentation Steward` integration (step 6), and session index logging (step 9). Added `edit` tool.
 - `Documentation Guidelines` prompt model updated to `GPT-5.4 (copilot)`.
-- `README.md` and asset catalog updated to reflect the documentation stewardship workflow and session tracking.
+- `README.md`, asset catalog, and VS Code consumption guide updated to reflect the deploy system, documentation stewardship workflow, and session tracking.
+- `scripts/install-vscode-assets.sh` marked deprecated in favor of `scripts/deploy-to-project.sh`.
 
-### Fixed in Unreleased
+### Fixed
 
 - Corrected `user-invokable` → `user-invocable` in frontmatter of `Feature Builder`, `Plan Architect`, and `Reviewer` agents.
 

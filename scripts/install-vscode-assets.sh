@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
+# DEPRECATED: This script is superseded by scripts/deploy-to-project.sh, which adds
+# full path mapping (docs/ -> .github/docs/, scripts/ -> .github/scripts/),
+# hook-path rewriting, and --clean support. Kept for backward compatibility only.
 
 set -eu
 
@@ -7,6 +10,7 @@ usage() {
 Usage: install-vscode-assets.sh [--dry-run] [--force] [target-directory]
 
 Copy the shared VS Code assets from this repository into a target workspace.
+DEPRECATED: Use deploy-to-project.sh instead.
 
 Options:
   --dry-run   Show what would be copied without modifying files

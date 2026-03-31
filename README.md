@@ -6,7 +6,7 @@
 
 **A VS Code-first control room for reusable agents, skills, hooks, instructions, prompts, and helper scripts.**
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue?style=for-the-badge&logo=gitbook&logoColor=white)](./CHANGELOG.md) [![Target](https://img.shields.io/badge/Target-VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](./LICENSE) [![Mode](https://img.shields.io/badge/Mode-Secondary%20Repo-111827?style=for-the-badge&logo=git&logoColor=white)](./docs/vscode-consumption.md)
+[![Version](https://img.shields.io/badge/version-0.1.1-blue?style=for-the-badge&logo=gitbook&logoColor=white)](./CHANGELOG.md) [![Target](https://img.shields.io/badge/Target-VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](./LICENSE) [![Mode](https://img.shields.io/badge/Mode-Secondary%20Repo-111827?style=for-the-badge&logo=git&logoColor=white)](./docs/vscode-consumption.md)
 
 ## Social Media
 
@@ -15,7 +15,7 @@
 </div>
 
 > [!IMPORTANT]
-> `universal-ide-agents` is intentionally VS Code-first in `v0.1.0`. Other editors belong to the roadmap, not the current support matrix.
+> `universal-ide-agents` is intentionally VS Code-first in `v0.1.1`. Other editors belong to the roadmap, not the current support matrix.
 
 <table>
   <tr>
@@ -53,7 +53,7 @@ flowchart LR
     B --> F[instructions]
     B --> G[prompts]
     B --> H[hooks]
-    C --> I[install-vscode-assets.sh]
+    C --> I[deploy-to-project.sh]
     C --> J[inject-context.sh]
     A --> K[Consumer repository]
     I --> K
@@ -75,28 +75,36 @@ flowchart LR
 
 ## Quick Start
 
-The recommended integration path for `v0.1.0` is: keep this repository as a Git submodule or secondary checkout, then use the install script to copy the shared VS Code assets into the target workspace.
+The recommended integration path is: keep this repository as a Git submodule at `.config/universal-ide-agents/`, then use `deploy-to-project.sh` to copy the shared assets into the target workspace.
 
 ```bash
 git submodule add git@github.com:Sebastian93BC/universal-ide-agents.git .config/universal-ide-agents
-./.config/universal-ide-agents/scripts/install-vscode-assets.sh "$PWD"
+./.config/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
 ```
 
-Use `--dry-run` to preview changes and `--force` if you want the shared version to replace an existing asset.
+Preview changes without writing any files:
 
 ```bash
-./.config/universal-ide-agents/scripts/install-vscode-assets.sh --dry-run "$PWD"
-./.config/universal-ide-agents/scripts/install-vscode-assets.sh --force "$PWD"
+./.config/universal-ide-agents/scripts/deploy-to-project.sh --dry-run "$PWD"
+```
+
+Update the submodule to `main` and redeploy, removing any files that were deleted from the source:
+
+```bash
+git submodule update --remote --merge
+./.config/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
 ```
 
 ## Editorial View
 
 ### Latest Entry
 
-#### March 31, 2026
+#### March 31, 2026 — v0.1.1
 
-The agent layer received a significant evolution:
+This release delivers the deploy system and the agent evolution:
 
+- `scripts/deploy-to-project.sh` is now the canonical deploy tool: maps `docs/` → `.github/docs/` and `scripts/` → `.github/scripts/`, rewrites the hook path in `context.json` for correct consumer resolution, supports `--dry-run` and `--clean`, and is idempotent
+- `scripts/install-vscode-assets.sh` is deprecated in favor of the deploy script
 - `Planner` now runs an `Explore` subagent for codebase research, follows a four-phase workflow, persists plans to sessions, and hands off to `Implementer`
 - `Implementer` reads approved plans from session memory, logs progress to session folders, and has expanded tool access
 - `Feature Builder` gained session tracking (slug generation, index logging) and integrates `Documentation Steward` before review
@@ -130,6 +138,7 @@ The repository launches as a clean VS Code asset hub with:
 │   ├── roadmap.md
 │   └── vscode-consumption.md
 ├── scripts/
+│   ├── deploy-to-project.sh
 │   ├── inject-context.sh
 │   └── install-vscode-assets.sh
 ├── CHANGELOG.md
