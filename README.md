@@ -6,7 +6,7 @@
 
 **A multi-IDE control room for reusable agents, skills, hooks, instructions, prompts, and helper scripts (supporting VS Code and Antigravity).**
 
-[![Version](https://img.shields.io/badge/version-0.1.1-blue?style=for-the-badge&logo=gitbook&logoColor=white)](./CHANGELOG.md) [![Target: VS Code](https://img.shields.io/badge/Target-VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/) [![Target: Antigravity](https://img.shields.io/badge/Target-Antigravity-4f46e5?style=for-the-badge&logo=google&logoColor=white)](./docs/antigravity-consumption.md) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](./LICENSE) [![Mode](https://img.shields.io/badge/Mode-Secondary%20Repo-111827?style=for-the-badge&logo=git&logoColor=white)](./docs/vscode-consumption.md)
+[![Version](https://img.shields.io/badge/version-0.1.2-blue?style=for-the-badge&logo=gitbook&logoColor=white)](./CHANGELOG.md) [![Target: VS Code](https://img.shields.io/badge/Target-VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/) [![Target: Antigravity](https://img.shields.io/badge/Target-Antigravity-4f46e5?style=for-the-badge&logo=google&logoColor=white)](./docs/antigravity-consumption.md) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](./LICENSE) [![Mode](https://img.shields.io/badge/Mode-Secondary%20Repo-111827?style=for-the-badge&logo=git&logoColor=white)](./docs/vscode-consumption.md)
 
 ## Social Media
 
@@ -99,7 +99,7 @@ git submodule update --remote --merge
 
 ### Latest Entry
 
-#### March 31, 2026 — v0.1.1
+#### May 27, 2026 — v0.1.2-dev
 
 This release delivers the deploy system and the agent evolution:
 
@@ -116,7 +116,7 @@ This release delivers the deploy system and the agent evolution:
 The repository launches as a clean VS Code asset hub with:
 
 - Rewritten repository instructions aligned to the actual project goal
-- A normalized agent layer for planning, code review, documentation syncing, and workflow orchestration
+- A normalized agent layer for planning, architecture review, implementation, and code review
 - A helper script for installing shared assets into target repositories
 - A helper script for session context injection via hooks
 - A documentation baseline with release notes, catalog, and roadmap
