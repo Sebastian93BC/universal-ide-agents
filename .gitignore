@@ -64,4 +64,5 @@ Thumbs.db
 .sass-cache/
 .env.local
 # Ignore local plan
-plan_improcement.md
+plan_improvement.md
+tasks.txt

@@ -1,3 +1,7 @@
+El archivo copilot-instructions que se genera dería se ad hoc al proyecto en el que se despliega,  para generar este archivo se emplea la opción del chat de copilot generate chat instruccionts en las configuraciones del chat
+Revision de nombres de los archivos
+¿es la estrucutra de carpteas actual ideal para el despliegue?
+
 ### FASE 2 — Versioning + Reviewer/Code Reviewer *(paralelas, independientes entre sí)*
 
 5. **Nueva instrucción de convenciones de versiones y tags**

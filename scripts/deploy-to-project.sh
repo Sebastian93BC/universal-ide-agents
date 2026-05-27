@@ -10,17 +10,19 @@ usage() {
   cat <<'EOF'
 Usage: deploy-to-project.sh [--dry-run] [--clean] [target-directory]
 
-Deploy the universal-ide-agents VS Code assets into a consumer project.
+Deploy the universal-ide-agents VS Code & Antigravity assets into a consumer project.
 
 Path mapping applied during deployment:
-  .github/agents/                  -> <target>/.github/agents/
-  .github/hooks/                   -> <target>/.github/hooks/
-  .github/instructions/            -> <target>/.github/instructions/
-  .github/prompts/                 -> <target>/.github/prompts/
-  .github/skills/                  -> <target>/.github/skills/
-  .github/copilot-instructions.md  -> <target>/.github/copilot-instructions.md
-  docs/                            -> <target>/.github/docs/
-  scripts/                         -> <target>/.github/scripts/
+  .github/agents/                      -> <target>/.github/agents/
+  .github/hooks/                       -> <target>/.github/hooks/
+  .github/instructions/                -> <target>/.github/instructions/
+  .github/prompts/                     -> <target>/.github/prompts/
+  .github/skills/                      -> <target>/.github/skills/
+  .github/copilot-instructions.md      -> <target>/.github/copilot-instructions.md
+  .github/antigravity-instructions.md  -> <target>/.github/antigravity-instructions.md
+  .antigravity-instructions.md         -> <target>/.antigravity-instructions.md
+  docs/                                -> <target>/.github/docs/
+  scripts/                             -> <target>/.github/scripts/
 
 Note: .github/sessions/ is never deployed to preserve the consumer session history.
 
@@ -133,6 +135,7 @@ rewrite_hook_path() {
   [ -f "$hook_json" ] || return 0
 
   tmp_file=$(mktemp)
+  trap 'rm -f "$tmp_file"' EXIT HUP INT TERM
   sed 's|./scripts/inject-context\.sh|./.github/scripts/inject-context.sh|g' \
     "$hook_json" > "$tmp_file" && mv "$tmp_file" "$hook_json"
   printf '[patch]   hook command -> ./.github/scripts/inject-context.sh\n'
@@ -144,14 +147,18 @@ clean_dir() {
 
   [ -d "$dst" ] || return 0
 
-  find "$dst" -type f | while IFS= read -r dst_file; do
-    rel="${dst_file#${dst}/}"
-    if [ ! -e "$src/$rel" ]; then
+  # Normalize paths by removing trailing slashes to prevent comparison bugs
+  src_norm=$(printf '%s' "$src" | sed 's|/*$||')
+  dst_norm=$(printf '%s' "$dst" | sed 's|/*$||')
+
+  find "$dst_norm" -type f | while IFS= read -r dst_file; do
+    rel="${dst_file#${dst_norm}/}"
+    if [ ! -e "$src_norm/$rel" ]; then
       if [ "$dry_run" -eq 1 ]; then
         printf '[dry-run] delete     %s\n' "$dst_file"
       else
         printf '[clean]   delete     %s\n' "$dst_file"
-        rm "$dst_file"
+        rm -f "$dst_file"
       fi
     fi
   done
@@ -168,6 +175,10 @@ deploy_dir  "$script_root/.github/prompts"               "$target_dir/.github/pr
 deploy_dir  "$script_root/.github/skills"                "$target_dir/.github/skills"
 deploy_file "$script_root/.github/copilot-instructions.md" \
             "$target_dir/.github/copilot-instructions.md"
+deploy_file "$script_root/.github/antigravity-instructions.md" \
+            "$target_dir/.github/antigravity-instructions.md"
+deploy_file "$script_root/.antigravity-instructions.md" \
+            "$target_dir/.antigravity-instructions.md"
 deploy_dir  "$script_root/docs"                          "$target_dir/.github/docs"
 deploy_dir  "$script_root/scripts"                       "$target_dir/.github/scripts"
 

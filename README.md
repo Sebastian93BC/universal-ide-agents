@@ -4,9 +4,9 @@
 
 <div align="center">
 
-**A VS Code-first control room for reusable agents, skills, hooks, instructions, prompts, and helper scripts.**
+**A multi-IDE control room for reusable agents, skills, hooks, instructions, prompts, and helper scripts (supporting VS Code and Antigravity).**
 
-[![Version](https://img.shields.io/badge/version-0.1.1-blue?style=for-the-badge&logo=gitbook&logoColor=white)](./CHANGELOG.md) [![Target](https://img.shields.io/badge/Target-VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](./LICENSE) [![Mode](https://img.shields.io/badge/Mode-Secondary%20Repo-111827?style=for-the-badge&logo=git&logoColor=white)](./docs/vscode-consumption.md)
+[![Version](https://img.shields.io/badge/version-0.1.1-blue?style=for-the-badge&logo=gitbook&logoColor=white)](./CHANGELOG.md) [![Target: VS Code](https://img.shields.io/badge/Target-VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/) [![Target: Antigravity](https://img.shields.io/badge/Target-Antigravity-4f46e5?style=for-the-badge&logo=google&logoColor=white)](./docs/antigravity-consumption.md) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](./LICENSE) [![Mode](https://img.shields.io/badge/Mode-Secondary%20Repo-111827?style=for-the-badge&logo=git&logoColor=white)](./docs/vscode-consumption.md)
 
 ## Social Media
 
@@ -15,7 +15,7 @@
 </div>
 
 > [!IMPORTANT]
-> `universal-ide-agents` is intentionally VS Code-first in `v0.1.1`. Other editors belong to the roadmap, not the current support matrix.
+> `universal-ide-agents` supports both **VS Code** (via Copilot Pro custom assets) and **Antigravity** (via native instructions and planning mode integrations).
 
 <table>
   <tr>
@@ -67,11 +67,11 @@ flowchart LR
 | --- | --- | --- |
 | Agents | Multi-step VS Code workflows for planning, implementation, review, and orchestration | `.github/agents/` |
 | Skills | Task-specific guidance bundles that improve discovery and reuse | `.github/skills/` |
-| Instructions | Always-on or file-scoped rules for consistent outputs | `.github/instructions/` |
+| Instructions | Always-on or file-scoped rules for consistent outputs in VS Code & Antigravity | `.github/instructions/`, `.github/antigravity-instructions.md`, `.antigravity-instructions.md` |
 | Prompts | Focused prompts for repeatable tasks | `.github/prompts/` |
 | Hooks | Deterministic lifecycle automation for VS Code agents | `.github/hooks/` |
 | Scripts | Portable shell helpers for setup, sync, and context injection | `scripts/` |
-| Documentation | Catalog, consumption guide, roadmap, and release notes | `docs/`, `README.md`, `CHANGELOG.md` |
+| Documentation | Catalog, consumption guides, roadmap, and release notes | `docs/`, `README.md`, `CHANGELOG.md` |
 
 ## Quick Start
 
@@ -116,7 +116,7 @@ This release delivers the deploy system and the agent evolution:
 The repository launches as a clean VS Code asset hub with:
 
 - Rewritten repository instructions aligned to the actual project goal
-- A normalized agent layer for planning, architecture review, implementation, and code review
+- A normalized agent layer for planning, code review, documentation syncing, and workflow orchestration
 - A helper script for installing shared assets into target repositories
 - A helper script for session context injection via hooks
 - A documentation baseline with release notes, catalog, and roadmap
@@ -150,19 +150,16 @@ The repository launches as a clean VS Code asset hub with:
 
 - [Asset catalog](./docs/asset-catalog.md)
 - [VS Code consumption guide](./docs/vscode-consumption.md)
+- [Antigravity consumption guide](./docs/antigravity-consumption.md)
 - [Roadmap](./docs/roadmap.md)
 - [Changelog](./CHANGELOG.md)
 
-## Core Agent Flows
-
 The shared agent layer currently covers:
 
-- `Planner` for codebase research, structured plan design, and session persistence
-- `Plan Architect` for validating plans against repository patterns and constraints
-- `Implementer` for plan-driven execution with session logging and expanded tool access
+- `Planner` for codebase research, structured plan design, session persistence, and self-validation
 - `Documentation Steward` for source-control-aware updates to `README.md`, `CHANGELOG.md`, and conditional `LICENSE` maintenance
 - `Reviewer` for final quality, safety, and maintainability review
-- `Feature Builder` for orchestration across planning, architecture validation, implementation, documentation sync, review, and session tracking
+- `Feature Builder` for orchestration across planning, native plan validation/implementation, documentation sync, review, and session tracking
 
 ## Versioning
 
@@ -179,6 +176,7 @@ This repository currently supports:
 
 - VS Code custom agents
 - VS Code prompts and instructions
+- Antigravity native instructions & planning mode integration
 - VS Code hook configuration
 - Reusable shell helpers for installing and supporting those assets
 

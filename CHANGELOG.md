@@ -8,7 +8,36 @@ This file follows Semantic Versioning and records meaningful changes to the shar
 
 ---
 
-## Unreleased
+## 0.1.2-dev · 2026-05-27
+
+<div>
+
+[![Release](https://img.shields.io/badge/release-0.1.2--dev-0F766E?style=for-the-badge)](./README.md) [![Target: Multi-IDE](https://img.shields.io/badge/target-VS%20Code%20%26%20Antigravity-4f46e5?style=for-the-badge&logo=google&logoColor=white)](./docs/antigravity-consumption.md) [![Stage](https://img.shields.io/badge/stage-multi--IDE%20expansion-1D4ED8?style=for-the-badge)](./docs/antigravity-consumption.md)
+
+</div>
+
+### Added
+
+- Native **Antigravity** compatibility layer to support the Google DeepMind agentic environment.
+- `.github/antigravity-instructions.md` & `.antigravity-instructions.md` containing repository-wide instructions, visual standards, and native role configurations (Planner, Implementer, Reviewer, Documentation Steward, Feature Builder).
+- `docs/antigravity-consumption.md` — a comprehensive guide detailing how to integrate, configure, and consume these assets inside the Antigravity agentic environment, leveraging standard planning mode files and interactive slash commands (`/grill-me`, `/goal`, `/schedule`).
+- Added walkthrough generation to the VS Code custom agent pipeline (`Feature Builder`), creating a matching `.github/sessions/{slug}/walkthrough.md` report at the end of delivery cycles for symmetric parity with Antigravity sessions.
+
+### Changed
+
+- `scripts/deploy-to-project.sh` expanded to map and deploy Antigravity instructions files alongside VS Code custom assets, maintaining idempotency and dry-run safety. Hardened with a signals `trap` on exit for temporary file cleanup and path normalization to prevent double trailing slash comparison bugs.
+- `scripts/inject-context.sh` maximum root listed files made configurable via the `MAX_ENTRIES` environment variable (defaulting to 20).
+- `README.md` and `docs/asset-catalog.md` updated to reflect the expanded support matrix, target badges, simplified agent layer (Planner, Documentation Steward, Reviewer, Feature Builder), and deprecated install-vscode-assets.sh helper.
+- `Feature Builder` orchestration streamlined: removed deleted subagents from core pipeline and updated orchestrator steps (Steps 3, 4, 5) to use native Copilot Plan/Agent Modes or Antigravity's Planning Mode directly with disk-based plan tracking (`.github/sessions/{slug}/plan.md`).
+- `Planner` agent upgraded to absorb design self-validation constraints, acting as its own quality validator to check for duplication, portability, and naming convention compliance.
+- `Reviewer` agent edit tool guidelines hardened to strictly prevent accidental repository asset edits (strictly limited to writing its own report).
+- Corrected `docs/vscode-consumption.md` layout paths from `.config/` to `.githubconfig/` to reflect v0.1.1 rename convention.
+- Added warning banner in both `.github/antigravity-instructions.md` and `.antigravity-instructions.md` to prevent future copy-drift.
+
+### Removed
+
+- **Removed `Plan Architect.agent.md`**: Delegated planning validation directly to native Copilot Plan Mode or manual verification.
+- **Removed `Implementer.agent.md`**: Scoped execution rules directly into the `Feature Builder` orchestrator, transitioning implementation tasks to native Copilot Agent Mode or Antigravity's Planning Mode.
 
 ## 0.1.1 · 2026-03-31
 

@@ -33,4 +33,4 @@ Your role is to review the work for quality, best practices, and adherence to [p
 ## Important Guidelines
 - Ask clarifying questions when design intent is unclear.
 - Focus on what should change and why.
-- Do not directly patch the source assets as part of the review itself.
+- **Strict Boundary**: Use the `edit` tool exclusively to write the session review report (`.github/sessions/{slug}/review.md`). Under no circumstances should you edit or patch repository source assets during the review process.

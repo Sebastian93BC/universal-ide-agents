@@ -36,7 +36,7 @@ The hook file `context.json` references `./scripts/inject-context.sh` in the sou
 
 ```text
 target-project/
-├── .config/
+├── .githubconfig/
 │   └── universal-ide-agents/       # submodule
 ├── .github/
 │   ├── agents/

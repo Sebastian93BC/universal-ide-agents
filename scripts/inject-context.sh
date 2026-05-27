@@ -39,6 +39,9 @@ if [ -d "$workspace/.github" ]; then
   echo "- .github: present"
 fi
 
+# Limit listed root entries to keep context lightweight, but make it configurable
+max_entries="${MAX_ENTRIES:-20}"
+
 echo "- Top-level entries:"
 find "$workspace" \
   -mindepth 1 \
@@ -46,4 +49,4 @@ find "$workspace" \
   ! -name '.git' \
   ! -name 'node_modules' \
   ! -name '.venv' \
-  -exec basename {} \; | sort | head -n 12 | sed 's/^/  - /'
+  -exec basename {} \; | sort | head -n "$max_entries" | sed 's/^/  - /'
