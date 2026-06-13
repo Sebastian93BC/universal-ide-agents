@@ -5,6 +5,12 @@
         "type": "command",
         "command": "./scripts/inject-context.sh"
       }
+    ],
+    "on_complete": [
+      {
+        "type": "command",
+        "command": "./scripts/save-session-output.sh"
+      }
     ]
   }
 }

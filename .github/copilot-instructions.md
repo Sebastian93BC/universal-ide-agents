@@ -14,7 +14,7 @@ Current scope:
 - `docs/*.md`
 
 Out of scope for `v0.1.0`:
-- JetBrains, Zed, Cursor, Windsurf, or other editor-specific layouts
+- JetBrains, Zed, Cursor, Windsurf, or other editor-specific layouts (except GitHub Copilot and Claude Code)
 - Project-specific business rules or domain assumptions
 - Non-portable hook or script implementations
 
@@ -23,9 +23,10 @@ Out of scope for `v0.1.0`:
 - Keep all reusable AI assets in English.
 - Write frontmatter as valid YAML and make `description` specific enough to trigger correctly.
 - Prefer small, composable assets over large monolithic files.
-- Keep prompts, agents, hooks, instructions, and skills VS Code-first and project-agnostic.
+- Keep prompts, agents, hooks, instructions, and skills IDE-agnostic and project-agnostic.
 - Treat scripts as helper tooling for setup, sync, and context injection, not as product code.
 - Document any new asset in the README or asset catalog when it changes discoverability.
+
 
 ## Naming Conventions
 

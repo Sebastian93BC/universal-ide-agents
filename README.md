@@ -4,9 +4,9 @@
 
 <div align="center">
 
-**A multi-IDE control room for reusable agents, skills, hooks, instructions, prompts, and helper scripts (supporting VS Code and Antigravity).**
+**A multi-IDE control room for reusable agents, skills, hooks, instructions, prompts, and helper scripts (supporting VS Code, Claude Code, and Antigravity).**
 
-[![Version](https://img.shields.io/badge/version-0.1.2-blue?style=for-the-badge&logo=gitbook&logoColor=white)](./CHANGELOG.md) [![Target: VS Code](https://img.shields.io/badge/Target-VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/) [![Target: Antigravity](https://img.shields.io/badge/Target-Antigravity-4f46e5?style=for-the-badge&logo=google&logoColor=white)](./docs/antigravity-consumption.md) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](./LICENSE) [![Mode](https://img.shields.io/badge/Mode-Secondary%20Repo-111827?style=for-the-badge&logo=git&logoColor=white)](./docs/vscode-consumption.md)
+[![Version](https://img.shields.io/badge/version-0.2.0--dev-blue?style=for-the-badge&logo=gitbook&logoColor=white)](./CHANGELOG.md) [![Target: VS Code](https://img.shields.io/badge/Target-VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/) [![Target: Claude Code](https://img.shields.io/badge/Target-Claude%20Code-D97706?style=for-the-badge&logo=anthropic&logoColor=white)](./CLAUDE.md) [![Target: Antigravity](https://img.shields.io/badge/Target-Antigravity-4f46e5?style=for-the-badge&logo=google&logoColor=white)](./docs/antigravity-consumption.md) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](./LICENSE) [![Mode](https://img.shields.io/badge/Mode-Secondary%20Repo-111827?style=for-the-badge&logo=git&logoColor=white)](./docs/vscode-consumption.md)
 
 ## Social Media
 
@@ -15,7 +15,7 @@
 </div>
 
 > [!IMPORTANT]
-> `universal-ide-agents` supports both **VS Code** (via Copilot Pro custom assets) and **Antigravity** (via native instructions and planning mode integrations).
+> `universal-ide-agents` supports **VS Code** (via Copilot Pro custom assets), **Claude Code** (via `CLAUDE.md` and global rules), and **Antigravity** (via native instructions and planning mode integrations).
 
 <table>
   <tr>
@@ -131,17 +131,25 @@ The repository launches as a clean VS Code asset hub with:
 │   ├── instructions/
 │   ├── prompts/
 │   ├── sessions/
+│   │   └── trace-db.jsonl
 │   ├── skills/
 │   └── copilot-instructions.md
 ├── docs/
 │   ├── asset-catalog.md
 │   ├── roadmap.md
 │   └── vscode-consumption.md
+├── plans/
+│   ├── README.md
+│   └── knowledge_base.md
 ├── scripts/
+│   ├── clean-notebook-outputs.py
 │   ├── deploy-to-project.sh
 │   ├── inject-context.sh
-│   └── install-vscode-assets.sh
+│   ├── install-vscode-assets.sh
+│   ├── save-session-output.sh
+│   └── scaffold-experimental-module.sh
 ├── CHANGELOG.md
+├── CLAUDE.md
 ├── LICENSE
 └── README.md
 ```
@@ -175,6 +183,7 @@ This repository follows Semantic Versioning.
 This repository currently supports:
 
 - VS Code custom agents
+- Claude Code custom workflows & rules via `CLAUDE.md`
 - VS Code prompts and instructions
 - Antigravity native instructions & planning mode integration
 - VS Code hook configuration

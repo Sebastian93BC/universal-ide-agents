@@ -8,6 +8,44 @@ This file follows Semantic Versioning and records meaningful changes to the shar
 
 ---
 
+## 0.2.0-dev · 2026-06-13
+
+<div>
+
+[![Release](https://img.shields.io/badge/release-0.2.0--dev-0F766E?style=for-the-badge)](./README.md) [![Target: Multi-IDE](https://img.shields.io/badge/target-VS%20Code%2C%20Claude%20Code%20%26%20Antigravity-4f46e5?style=for-the-badge&logo=google&logoColor=white)](./docs/antigravity-consumption.md) [![Stage](https://img.shields.io/badge/stage-multi--IDE%20expansion-1D4ED8?style=for-the-badge)](./docs/antigravity-consumption.md)
+
+</div>
+
+### Added
+
+- **Claude Code Support**: Added `CLAUDE.md` to bridge repository instructions, agents, and modular scripts to the Claude Code CLI.
+- **Data Science / Notebook Methodology**: Native support for the 6-phase experimental notebook lifecycle (Exploration → Extraction → Diagnosis → Lessons → Commits → Promotion).
+- **New Agents**:
+  - `.github/agents/Code Reviewer.agent.md` focusing on code quality, security (OWASP), accessibility, and design patterns.
+  - `.github/agents/Data Science Developer.agent.md` to guide the 6-phase notebook cycle.
+  - `.github/agents/Scientific Paper Research.agent.md` relying on the `bgpt` MCP server.
+- **New Instructions**:
+  - `.github/instructions/Versioning.instructions.md` for `CHANGELOG.md` edits.
+  - `.github/instructions/Planning.instructions.md` to route plans to the `plans/` directory.
+  - `.github/instructions/NotebookMethodology.instructions.md` for notebooks development.
+- **New Automation Tools**:
+  - `scripts/save-session-output.sh` to backup plans, walkthroughs, and reviews.
+  - `scripts/scaffold-experimental-module.sh` to bootstrap new notebooks folders.
+  - `scripts/clean-notebook-outputs.py` to strip cells outputs and metadata.
+- **Plans & Traceability Centralization**:
+  - `plans/README.md` (dashboard) and `plans/knowledge_base.md` (tech decisions log).
+  - `.github/sessions/trace-db.jsonl` log file for agent execution traces.
+
+### Changed
+
+- `scripts/deploy-to-project.sh` expanded to copy `CLAUDE.md` and dynamically rewrite hook commands inside `context.json`.
+- `.github/copilot-instructions.md` made IDE-agnostic and expanded to include Claude Code in its scope.
+- `.github/agents/Reviewer.agent.md` refactored to focus solely on VS Code assets quality.
+- `.github/agents/Feature Builder.agent.md` updated to include `Code Reviewer` in its pipeline.
+- `.github/hooks/context.json` updated with `on_complete` hook to automatically save session outputs.
+
+---
+
 ## 0.1.2-dev · 2026-05-27
 
 <div>

@@ -21,6 +21,7 @@ Path mapping applied during deployment:
   .github/copilot-instructions.md      -> <target>/.github/copilot-instructions.md
   .github/antigravity-instructions.md  -> <target>/.github/antigravity-instructions.md
   .antigravity-instructions.md         -> <target>/.antigravity-instructions.md
+  CLAUDE.md                            -> <target>/CLAUDE.md
   docs/                                -> <target>/.github/docs/
   scripts/                             -> <target>/.github/scripts/
 
@@ -136,9 +137,10 @@ rewrite_hook_path() {
 
   tmp_file=$(mktemp)
   trap 'rm -f "$tmp_file"' EXIT HUP INT TERM
-  sed 's|./scripts/inject-context\.sh|./.github/scripts/inject-context.sh|g' \
+  sed -e 's|./scripts/inject-context\.sh|./.github/scripts/inject-context.sh|g' \
+      -e 's|./scripts/save-session-output\.sh|./.github/scripts/save-session-output.sh|g' \
     "$hook_json" > "$tmp_file" && mv "$tmp_file" "$hook_json"
-  printf '[patch]   hook command -> ./.github/scripts/inject-context.sh\n'
+  printf '[patch]   hook commands -> ./.github/scripts/ (inject-context.sh, save-session-output.sh)\n'
 }
 
 clean_dir() {
@@ -179,6 +181,8 @@ deploy_file "$script_root/.github/antigravity-instructions.md" \
             "$target_dir/.github/antigravity-instructions.md"
 deploy_file "$script_root/.antigravity-instructions.md" \
             "$target_dir/.antigravity-instructions.md"
+deploy_file "$script_root/CLAUDE.md" \
+            "$target_dir/CLAUDE.md"
 deploy_dir  "$script_root/docs"                          "$target_dir/.github/docs"
 deploy_dir  "$script_root/scripts"                       "$target_dir/.github/scripts"
 
