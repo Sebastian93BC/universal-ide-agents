@@ -13,6 +13,8 @@ Current scope:
 - `scripts/*.sh`
 - `docs/*.md`
 
+- **Ignorar TO_DO.md**: El archivo `TO_DO.md` en la raíz está reservado exclusivamente para desarrolladores humanos. Los agentes de IA (Copilot, Claude Code, etc.) deben ignorarlo por completo y nunca leerlo, interpretarlo ni modificarlo.
+
 Out of scope for `v0.1.0`:
 - JetBrains, Zed, Cursor, Windsurf, or other editor-specific layouts (except GitHub Copilot and Claude Code)
 - Project-specific business rules or domain assumptions

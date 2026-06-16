@@ -75,6 +75,7 @@ To ensure full collaboration with other IDE agents (like VS Code Copilot and Cla
   - *Correct*: `[deploy-to-project.sh](file:///path/to/scripts/deploy-to-project.sh)`
   - *Incorrect*: `[\`deploy-to-project.sh\`](file:///path/to/scripts/deploy-to-project.sh)`
 - **Alerts**: Strategic use of GitHub alerts (`> [!NOTE]`, `> [!IMPORTANT]`, etc.) to emphasize key decisions, warnings, or constraints. Do not stack them or nest them.
+- **Ignorar TO_DO.md**: El archivo `TO_DO.md` en la raíz está reservado exclusivamente para desarrolladores humanos. Como agente de IA (Google Antigravity), debes ignorarlo por completo y nunca leerlo, interpretarlo ni modificarlo.
 
 ---
 
