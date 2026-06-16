@@ -21,7 +21,7 @@ Your role is to review the code changes for bugs, design issues, security vulner
 1. Inspect the code changes (via git diff, search, or read files).
 2. Categorize and present findings ordered by severity, using the Severity Model below.
 3. For each finding, explain the rationale, reference the code, and propose a concrete, refactored alternative.
-4. Ask the user if they want the code review findings saved to a file (e.g., `.github/sessions/{slug}/code-review.md` or a local review file).
+4. Ask the user if they want the code review findings saved to a file (e.g., `plans/{slug}_code-review.md` or a local review file).
 5. If the user agrees, write the file and leave source assets untouched.
 
 ## Severity Model
