@@ -26,6 +26,10 @@ Path mapping applied during deployment:
   scripts/                             -> <target>/.github/scripts/
 
 Note: .github/sessions/ is never deployed to preserve the consumer session history.
+Instead, the target project's plans/ directory is initialized/scaffolded safely:
+  - Creating plans/knowledge/, plans/walkthroughs/, plans/historyPlans/ if not present.
+  - Copying plans/README.md standard.
+  - Initializing plans/registry.md only if it does not already exist, preserving existing consumer task registry history.
 
 After copying, the hook path inside <target>/.github/hooks/context.json is
 rewritten from ./scripts/inject-context.sh to ./.github/scripts/inject-context.sh
@@ -166,6 +170,50 @@ clean_dir() {
   done
 }
 
+scaffold_plans() {
+  printf '\n--- scaffolding plans directory ---\n'
+  
+  if [ "$dry_run" -eq 1 ]; then
+    printf '[dry-run] create directories target/plans/{knowledge,walkthroughs,historyPlans}\n'
+    if [ ! -f "$target_dir/plans/registry.md" ]; then
+      printf '[dry-run] create file target/plans/registry.md\n'
+    fi
+    printf '[dry-run] copy plans/README.md -> target/plans/README.md\n'
+    return 0
+  fi
+
+  mkdir -p "$target_dir/plans/knowledge" "$target_dir/plans/walkthroughs" "$target_dir/plans/historyPlans"
+  printf '[scaffold] created target/plans/ folders (knowledge, walkthroughs, historyPlans)\n'
+
+  # Copy the README.md standard
+  cp "$script_root/plans/README.md" "$target_dir/plans/README.md"
+  printf '[scaffold] copied plans/README.md -> target/plans/README.md\n'
+
+  # Create registry.md if not exists, to prevent overwriting consumer registry
+  if [ ! -f "$target_dir/plans/registry.md" ]; then
+    cat <<'EOF' > "$target_dir/plans/registry.md"
+# Registro de Planes y Tareas
+
+Este archivo centraliza el estado y el historial de todas las tareas y planes de desarrollo ejecutados en este repositorio por los agentes de IA (Google Antigravity, Claude Code, Copilot) y desarrolladores humanos.
+
+## Control de Tareas y Estados
+
+| ID | Plan / Tarea | Estado | Creado | Modificado | Enlace al Plan | Enlace al Reporte (Walkthrough) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+
+---
+
+## Estados Disponibles
+- `En Progreso`: La tarea está siendo activamente investigada, planificada o implementada.
+- `Completado`: El plan ha sido ejecutado, verificado y archivado.
+- `Pausado`: La tarea está detenida temporalmente a la espera de definiciones o aprobación.
+EOF
+    printf '[scaffold] initialized target/plans/registry.md (empty)\n'
+  else
+    printf '[scaffold] target/plans/registry.md already exists. Preserving consumer history.\n'
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Deploy
 # ---------------------------------------------------------------------------
@@ -185,6 +233,7 @@ deploy_file "$script_root/CLAUDE.md" \
             "$target_dir/CLAUDE.md"
 deploy_dir  "$script_root/docs"                          "$target_dir/.github/docs"
 deploy_dir  "$script_root/scripts"                       "$target_dir/.github/scripts"
+scaffold_plans
 
 if [ "$dry_run" -eq 0 ]; then
   rewrite_hook_path
