@@ -173,6 +173,13 @@ clean_dir() {
 scaffold_plans() {
   printf '\n--- scaffolding plans directory ---\n'
   
+  if [ -d "$target_dir/plans" ]; then
+    printf '[info]    Se detecto la existencia previa de la carpeta plans/ en el proyecto.\n'
+    printf '          -> Integrando nueva estructura de forma segura (preservando historial local).\n'
+  else
+    printf '[info]    No se detecto carpeta plans/ previa. Inicializando nueva estructura.\n'
+  fi
+  
   if [ "$dry_run" -eq 1 ]; then
     printf '[dry-run] create directories target/plans/{knowledge,walkthroughs,historyPlans}\n'
     if [ ! -f "$target_dir/plans/registry.md" ]; then

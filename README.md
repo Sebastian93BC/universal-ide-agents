@@ -95,6 +95,14 @@ git submodule update --remote --merge
 ./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
 ```
 
+### Integración con carpetas `plans/` existentes
+
+Si el proyecto destino ya cuenta con una carpeta `plans/`, el script de despliegue lo detectará automáticamente y activará una **integración segura**:
+- Creará las subcarpetas necesarias (`plans/knowledge/`, `plans/walkthroughs/`, `plans/historyPlans/`) sin alterar tus planes locales.
+- Actualizará la documentación técnica del directorio (`plans/README.md`).
+- **No sobrescribirá** tu archivo de control `plans/registry.md` si ya existe, previniendo la pérdida de tu historial de tareas.
+
+
 ## Editorial View
 
 ### Latest Entry
@@ -140,7 +148,11 @@ The repository launches as a clean VS Code asset hub with:
 │   └── vscode-consumption.md
 ├── plans/
 │   ├── README.md
-│   └── knowledge_base.md
+│   ├── registry.md
+│   ├── historyPlans/
+│   ├── knowledge/
+│   │   └── knowledge_base.md
+│   └── walkthroughs/
 ├── scripts/
 │   ├── clean-notebook-outputs.py
 │   ├── deploy-to-project.sh
