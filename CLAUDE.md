@@ -23,6 +23,7 @@ Claude Code does not natively support Copilot's `@agent` syntax. However, if the
 Whenever you edit files that match the `applyTo` patterns of our instructions under `.github/instructions/`, you must load and respect those instructions:
 - When editing `CHANGELOG.md`, strictly apply the rules in `.github/instructions/Versioning.instructions.md`.
 - When editing notebooks (`.ipynb`) or files under exploration folders, apply the rules in `.github/instructions/NotebookMethodology.instructions.md`.
+- When managing updates, submodules, or resolving deployment/merge conflicts, apply the rules in `.github/instructions/SyncAndConflicts.instructions.md`.
 
 ## 4. Hook and Script Execution
 - Respect the hooks defined in `.github/hooks/context.json`.

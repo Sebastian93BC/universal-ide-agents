@@ -79,7 +79,16 @@ To ensure full collaboration with other IDE agents (like VS Code Copilot and Cla
 
 ---
 
-## 3. Contribution and Evolution
+## 3. Submodule Sync and Conflict Resolution
+
+When asked to update, sync, or resolve conflicts during a submodule update:
+- Strictly follow the protocols outlined in [SyncAndConflicts.instructions.md](./.github/instructions/SyncAndConflicts.instructions.md).
+- Prioritize identifying any local modifications in the `.github/` folder before running `deploy-to-project.sh` to prevent overwriting user changes.
+- Actively help the user merge or resolve conflicts inside the `.githubconfig/universal-ide-agents/` directory.
+
+---
+
+## 4. Contribution and Evolution
 
 - Keep all shared assets project-agnostic, portable, and clean.
 - Update `CHANGELOG.md` following Semantic Versioning whenever assets are modified.

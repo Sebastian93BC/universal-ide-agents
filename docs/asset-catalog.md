@@ -33,6 +33,7 @@ This catalog documents the reusable VS Code & Antigravity assets currently shipp
 | `.github/instructions/Versioning.instructions.md` | `CHANGELOG.md` | Rules for tag formats, semantic versioning, and changelog format |
 | `.github/instructions/Planning.instructions.md` | `plans/**/*` | Rules for planning, structuring, and persisting plans to the plans/ directory |
 | `.github/instructions/NotebookMethodology.instructions.md` | `**/*.ipynb` | Enforces modular folder structures and the 6-phase notebook lifecycle |
+| `.github/instructions/SyncAndConflicts.instructions.md` | `.githubconfig/universal-ide-agents/**/*` | Guidelines for managing updates, submodules, and resolving deployment or git conflicts |
 
 ## Prompts
 

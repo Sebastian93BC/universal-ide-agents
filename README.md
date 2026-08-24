@@ -75,32 +75,56 @@ flowchart LR
 
 ## Quick Start
 
-The recommended integration path is: keep this repository as a Git submodule at `.githubconfig/universal-ide-agents/`, then use `deploy-to-project.sh` to copy the shared assets into the target workspace.
+To use these shared agents and assets in your project, follow this sequential step-by-step guide from the root directory of your **target repository**:
 
-```bash
-git submodule add git@github.com:Sebastian93BC/universal-ide-agents.git .githubconfig/universal-ide-agents
-./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
-```
+### 1. First-Time Setup (Instalación Inicial)
 
-Preview changes without writing any files:
+Execute the following commands in order:
 
+1. **Add the submodule**: 
+   Link this repository as a Git submodule inside the `.githubconfig/` directory:
+   ```bash
+   git submodule add git@github.com:Sebastian93BC/universal-ide-agents.git .githubconfig/universal-ide-agents
+   ```
+
+2. **Deploy the assets**:
+   Run the deployment script from the submodule. Passing `"$PWD"` specifies your current working directory as the target to copy and map all configuration files:
+   ```bash
+   ./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
+   ```
+
+### 2. Preview and Validation (Opcional)
+
+If you want to see what files would be modified or created without actually applying the changes:
 ```bash
 ./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --dry-run "$PWD"
 ```
 
-Update the submodule to `main` and redeploy, removing any files that were deleted from the source:
+### 3. Ongoing Updates (Cómo actualizar)
 
+To pull new updates from the shared repository, update the submodule and trigger the redeployment. The `--clean` flag removes any obsolete shared assets that were deleted in the source repository since your last sync:
 ```bash
+# 1. Update the submodule to the latest commit on main
 git submodule update --remote --merge
+
+# 2. Redeploy and clean up removed files
 ./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
 ```
 
-### Integración con carpetas `plans/` existentes
+### Despliegue y scaffolding de la carpeta `plans/`
 
-Si el proyecto destino ya cuenta con una carpeta `plans/`, el script de despliegue lo detectará automáticamente y activará una **integración segura**:
-- Creará las subcarpetas necesarias (`plans/knowledge/`, `plans/walkthroughs/`, `plans/historyPlans/`) sin alterar tus planes locales.
-- Actualizará la documentación técnica del directorio (`plans/README.md`).
-- **No sobrescribirá** tu archivo de control `plans/registry.md` si ya existe, previniendo la pérdida de tu historial de tareas.
+El script de despliegue (`deploy-to-project.sh`) se encarga de estructurar automáticamente el directorio `plans/` en tu proyecto de destino.
+
+- **Si el proyecto de destino NO tiene una carpeta `plans/`**:
+  - Creará la carpeta `plans/` y las subcarpetas requeridas: `plans/knowledge/`, `plans/walkthroughs/` y `plans/historyPlans/`.
+  - Copiará el estándar `plans/README.md`.
+  - Inicializará un archivo de control de tareas vacío: `plans/registry.md`.
+
+- **Si el proyecto de destino YA cuenta con una carpeta `plans/`**:
+  - Realizará una **integración segura** y no destructiva.
+  - Creará las subcarpetas que falten sin alterar tus planes locales.
+  - Actualizará el archivo `plans/README.md`.
+  - **No sobrescribirá** tu archivo de control `plans/registry.md` si ya existe, para prevenir la pérdida de tu historial local de tareas y estados.
 
 
 ## Editorial View
