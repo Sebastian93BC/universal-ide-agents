@@ -8,19 +8,20 @@ set -eu
 
 usage() {
   cat <<'EOF'
-Usage: deploy-to-project.sh [--dry-run] [--clean] [target-directory]
+Usage: deploy-to-project.sh [--dry-run] [--clean] [--target all|antigravity|claude|vscode] [--profile <profile-id>] [target-directory]
 
-Deploy the universal-ide-agents VS Code & Antigravity assets into a consumer project.
+Deploy the universal-ide-agents multi-IDE Data Engineering assets into a consumer project.
 
 Path mapping applied during deployment:
-  .github/agents/                      -> <target>/.github/agents/
+  .agents/                             -> <target>/.agents/               (Antigravity / Gemini CLI)
+  .claude/                             -> <target>/.claude/               (Claude Code)
+  .github/agents/                      -> <target>/.github/agents/        (VS Code / Copilot)
   .github/hooks/                       -> <target>/.github/hooks/
   .github/instructions/                -> <target>/.github/instructions/
-  .github/prompts/                     -> <target>/.github/prompts/
   .github/skills/                      -> <target>/.github/skills/
   .github/copilot-instructions.md      -> <target>/.github/copilot-instructions.md
-  .github/antigravity-instructions.md  -> <target>/.github/antigravity-instructions.md
   .antigravity-instructions.md         -> <target>/.antigravity-instructions.md
+  AGENTS.md                            -> <target>/AGENTS.md
   CLAUDE.md                            -> <target>/CLAUDE.md
   docs/                                -> <target>/.github/docs/
   scripts/                             -> <target>/.github/scripts/
@@ -68,11 +69,21 @@ script_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 target_dir="${PWD}"
 dry_run=0
 clean=0
+ide_target="all"
+profile_id="data-eng-full"
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --dry-run) dry_run=1 ;;
     --clean)   clean=1 ;;
+    --target)
+      shift
+      ide_target="${1:-all}"
+      ;;
+    --profile)
+      shift
+      profile_id="${1:-data-eng-full}"
+      ;;
     --help|-h) usage; exit 0 ;;
     -*)
       printf 'Unknown option: %s\n' "$1" >&2
@@ -222,27 +233,38 @@ EOF
 }
 
 # ---------------------------------------------------------------------------
-# Deploy
+# Deploy (Multi-IDE: Antigravity + Claude Code + VS Code Copilot)
 # ---------------------------------------------------------------------------
 
-deploy_dir  "$script_root/.github/agents"                "$target_dir/.github/agents"
-deploy_dir  "$script_root/.github/hooks"                 "$target_dir/.github/hooks"
-deploy_dir  "$script_root/.github/instructions"          "$target_dir/.github/instructions"
-deploy_dir  "$script_root/.github/prompts"               "$target_dir/.github/prompts"
-deploy_dir  "$script_root/.github/skills"                "$target_dir/.github/skills"
-deploy_file "$script_root/.github/copilot-instructions.md" \
-            "$target_dir/.github/copilot-instructions.md"
-deploy_file "$script_root/.github/antigravity-instructions.md" \
-            "$target_dir/.github/antigravity-instructions.md"
-deploy_file "$script_root/.antigravity-instructions.md" \
-            "$target_dir/.antigravity-instructions.md"
-deploy_file "$script_root/CLAUDE.md" \
-            "$target_dir/CLAUDE.md"
-deploy_dir  "$script_root/docs"                          "$target_dir/.github/docs"
-deploy_dir  "$script_root/scripts"                       "$target_dir/.github/scripts"
+printf '[info]    Deploying profile="%s" target="%s" to %s\n' "$profile_id" "$ide_target" "$target_dir"
+
+if [ "$ide_target" = "all" ] || [ "$ide_target" = "vscode" ]; then
+  deploy_dir  "$script_root/.github/agents"                "$target_dir/.github/agents"
+  deploy_dir  "$script_root/.github/hooks"                 "$target_dir/.github/hooks"
+  deploy_dir  "$script_root/.github/instructions"          "$target_dir/.github/instructions"
+  deploy_dir  "$script_root/.github/skills"                "$target_dir/.github/skills"
+  deploy_file "$script_root/.github/copilot-instructions.md" \
+              "$target_dir/.github/copilot-instructions.md"
+  deploy_file "$script_root/AGENTS.md"                     "$target_dir/AGENTS.md"
+  deploy_dir  "$script_root/docs"                          "$target_dir/.github/docs"
+  deploy_dir  "$script_root/scripts"                       "$target_dir/.github/scripts"
+fi
+
+if [ "$ide_target" = "all" ] || [ "$ide_target" = "antigravity" ]; then
+  deploy_dir  "$script_root/.agents"                       "$target_dir/.agents"
+  deploy_file "$script_root/.antigravity-instructions.md"  "$target_dir/.antigravity-instructions.md"
+  deploy_file "$script_root/AGENTS.md"                     "$target_dir/AGENTS.md"
+fi
+
+if [ "$ide_target" = "all" ] || [ "$ide_target" = "claude" ]; then
+  deploy_dir  "$script_root/.claude"                       "$target_dir/.claude"
+  deploy_file "$script_root/CLAUDE.md"                     "$target_dir/CLAUDE.md"
+  deploy_file "$script_root/AGENTS.md"                     "$target_dir/AGENTS.md"
+fi
+
 scaffold_plans
 
-if [ "$dry_run" -eq 0 ]; then
+if [ "$dry_run" -eq 0 ] && { [ "$ide_target" = "all" ] || [ "$ide_target" = "vscode" ]; }; then
   rewrite_hook_path
 fi
 
@@ -252,13 +274,20 @@ fi
 
 if [ "$clean" -eq 1 ]; then
   printf '\n--- running --clean ---\n'
-  clean_dir "$script_root/.github/agents"      "$target_dir/.github/agents"
-  clean_dir "$script_root/.github/hooks"       "$target_dir/.github/hooks"
-  clean_dir "$script_root/.github/instructions" "$target_dir/.github/instructions"
-  clean_dir "$script_root/.github/prompts"     "$target_dir/.github/prompts"
-  clean_dir "$script_root/.github/skills"      "$target_dir/.github/skills"
-  clean_dir "$script_root/docs"                "$target_dir/.github/docs"
-  clean_dir "$script_root/scripts"             "$target_dir/.github/scripts"
+  if [ "$ide_target" = "all" ] || [ "$ide_target" = "vscode" ]; then
+    clean_dir "$script_root/.github/agents"       "$target_dir/.github/agents"
+    clean_dir "$script_root/.github/hooks"        "$target_dir/.github/hooks"
+    clean_dir "$script_root/.github/instructions" "$target_dir/.github/instructions"
+    clean_dir "$script_root/.github/skills"       "$target_dir/.github/skills"
+    clean_dir "$script_root/docs"                 "$target_dir/.github/docs"
+    clean_dir "$script_root/scripts"              "$target_dir/.github/scripts"
+  fi
+  if [ "$ide_target" = "all" ] || [ "$ide_target" = "antigravity" ]; then
+    clean_dir "$script_root/.agents"              "$target_dir/.agents"
+  fi
+  if [ "$ide_target" = "all" ] || [ "$ide_target" = "claude" ]; then
+    clean_dir "$script_root/.claude"              "$target_dir/.claude"
+  fi
 fi
 
 printf '\nDeployed universal-ide-agents assets to: %s\n' "$target_dir"

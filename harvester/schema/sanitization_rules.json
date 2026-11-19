@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "description": "Reglas de sanitización, límites de plataforma y taxonomía de consolidación de memoria procedural (CREATE/UPDATE/INVALIDATE).",
+  "platformLimits": {
+    "antigravityMaxSkillChars": 12000,
+    "rootInstructionMaxLines": 180
+  },
+  "forbiddenClientTerms": [
+    "[cliente]",
+    "[cliente]",
+    "[cliente]",
+    "[cliente]",
+    "[cliente]",
+    "[cliente]",
+    "[cliente]",
+    "[cliente]",
+    "[cliente]",
+    "[cliente]"
+  ],
+  "forbiddenSecretPatterns": [
+    "mongodb(\\+srv)?://[^\\s\"'`]+:[^\\s\"'`]+@",
+    "postgres(ql)?://[^\\s\"'`]+:[^\\s\"'`]+@",
+    "ghp_[A-Za-z0-9]{20,}",
+    "sk-[A-Za-z0-9]{20,}",
+    "AIza[0-9A-Za-z-_]{35}"
+  ],
+  "forbiddenPathPatterns": [
+    "/Users/[A-Za-z0-9._-]+/"
+  ],
+  "provenanceHierarchy": [
+    {
+      "level": 1,
+      "sourceType": "verified_production_code_or_postmortem",
+      "trustScore": 1.0,
+      "description": "Invariante verificado en producción, post-mortem técnico con causa raíz o script de validación reproducible."
+    },
+    {
+      "level": 2,
+      "sourceType": "explicit_engineer_rule_or_skill",
+      "trustScore": 0.9,
+      "description": "Regla o skill escrita explícitamente por el ingeniero en CLAUDE.md, AGENTS.md o SKILL.md."
+    },
+    {
+      "level": 3,
+      "sourceType": "official_course_or_documentation",
+      "trustScore": 0.85,
+      "description": "Patrón extraído de documentación oficial (MongoDB, DuckDB, Dagster, dbt, Google AgentOps) o curso técnico."
+    },
+    {
+      "level": 4,
+      "sourceType": "inferred_session_memory",
+      "trustScore": 0.6,
+      "description": "Nota inferida de sesión; requiere corroboración antes de convertirse en regla always_on."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "mcpServers": {
+    "dbt": {
+      "command": "uvx",
+      "args": ["dbt-mcp"],
+      "env": {
+        "DBT_PROJECT_DIR": "${DBT_PROJECT_DIR}",
+        "DBT_PROFILES_DIR": "${DBT_PROFILES_DIR}"
+      }
+    },
+    "dagster": {
+      "command": "uvx",
+      "args": ["--from", "dagster-dg-cli", "dg", "mcp", "serve"],
+      "env": {
+        "DAGSTER_HOME": "${DAGSTER_HOME}"
+      }
+    },
+    "duckdb": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-duckdb",
+        "--db-path",
+        "${DUCKDB_WAREHOUSE_PATH}",
+        "--read-only"
+      ]
+    },
+    "mongodb": {
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server", "--readOnly"],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "${MONGODB_READONLY_URI}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "${POSTGRES_READONLY_URI}"
+      ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
+}

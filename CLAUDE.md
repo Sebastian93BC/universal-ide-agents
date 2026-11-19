@@ -1,31 +1,31 @@
-# Claude Code — Repository Guidelines
+# CLAUDE.md — Guía Operativa para Claude Code (`universal-ide-agents`)
 
-This project uses a modular system of agents, prompts, and instructions to maintain code quality, streamline development, and automate workflows.
+Lee primero [AGENTS.md](./AGENTS.md), que actúa como la constitución multi-IDE del repositorio.
 
-As Claude Code, you must align your behavior with the guidelines established for this repository.
+## 1. Comandos Esenciales del Repositorio
 
-## 1. Core Instructions
-- Read and follow the rules in `.github/copilot-instructions.md` as the primary repository guide.
-- Adhere to the defined folder structure:
-  - `.github/agents/*.agent.md` — Declarations of agent roles and workflows.
-  - `.github/instructions/*.instructions.md` — Modularity-specific rules (e.g., versioning).
-  - `.github/prompts/*.prompt.md` — Prompts for on-demand use.
-  - `plans/` — The single source of truth for planning and repository knowledge.
+- **Validar `core/` y compilar hacia `.agents/`, `.claude/` y `.github/`**:
+  ```bash
+  python3 scripts/validate_and_build.py
+  ```
+- **Ejecutar cosecha periódica de conocimientos desde proyectos y cursos locales**:
+  ```bash
+  python3 scripts/harvest.py
+  ```
+- **Desplegar activos hacia un proyecto consumidor (con previsualización `--dry-run`)**:
+  ```bash
+  ./scripts/deploy-to-project.sh --dry-run --target all --profile data-eng-full /ruta/al/proyecto
+  ```
 
-## 2. Simulating Agent Workflows
-Claude Code does not natively support Copilot's `@agent` syntax. However, if the user requests you to act as one of our custom agents, or mentions them, you must load and simulate the workflow defined in their configuration:
-- **Feature Builder**: Simulates the full workflow in `.github/agents/Feature Builder.agent.md`.
-- **Planner**: Simulates research, plan creation, and user approval gates using `.github/agents/Planner.agent.md`.
-- **Reviewer / Code Reviewer**: Performs reviews following `.github/agents/Reviewer.agent.md` or `.github/agents/Code Reviewer.agent.md`.
-- **Data Science Developer**: Guides the 6-phase notebook development cycle following `.github/agents/Data Science Developer.agent.md`.
+## 2. Estructura Compilada para Claude Code (`.claude/`)
 
-## 3. Passive Instruction Application
-Whenever you edit files that match the `applyTo` patterns of our instructions under `.github/instructions/`, you must load and respect those instructions:
-- When editing `CHANGELOG.md`, strictly apply the rules in `.github/instructions/Versioning.instructions.md`.
-- When editing notebooks (`.ipynb`) or files under exploration folders, apply the rules in `.github/instructions/NotebookMethodology.instructions.md`.
-- When managing updates, submodules, or resolving deployment/merge conflicts, apply the rules in `.github/instructions/SyncAndConflicts.instructions.md`.
+- **Subagentes Especializados**: `.claude/agents/` (`data-engineer.md`, `data-modeling-architect.md`, `data-security-auditor.md`, `pipeline-reviewer.md`, `pipeline-incident-triage.md`, `planner.md`, `implementer.md`, `code-reviewer.md`, `docs-steward.md`, `tdd-cycle.md`, `knowledge-harvester.md`).
+- **Skills Bajo Demanda (`SKILL.md`)**: `.claude/skills/<skill-name>/SKILL.md` (25 skills cubriendo MongoDB, DuckDB/DuckLake, Dagster, dbt, PySpark/Delta/Iceberg, Kafka/Debezium, Great Expectations/OpenLineage, Modelado Políglota, Docker, n8n, OTel y ML Inference).
+- **Reglas Modulares**: `.claude/rules/*.md`.
+- **Plantilla de Servidores MCP**: `.claude/mcp.example.json` (copiar a `.mcp.json` y definir variables de entorno `${DBT_PROJECT_DIR}`, `${DUCKDB_WAREHOUSE_PATH}`, `${MONGODB_READONLY_URI}`).
 
-## 4. Hook and Script Execution
-- Respect the hooks defined in `.github/hooks/context.json`.
-- Before executing commands, ensure you use the local scripts (e.g., `scripts/deploy-to-project.sh`, `scripts/scaffold-experimental-module.sh`) and respect the project's sandboxing limits.
-- When finishing a task or session, trigger the logic in `scripts/save-session-output.sh` (usually triggered by the `on_complete` hook) to persist plans and outputs.
+## 3. Restricciones Críticas
+
+1. **No edites directamente `.claude/`, `.agents/` ni `.github/skills/`**: son directorios compilados. Edita `core/` y ejecuta `python3 scripts/validate_and_build.py`.
+2. **Prohibido usar diagramas Mermaid**: usa SVG en `docs/img/` o tablas Markdown.
+3. **Ignora `TO_DO.md`**: usa exclusivamente `plans/registry.md` y `CHANGELOG.md`.

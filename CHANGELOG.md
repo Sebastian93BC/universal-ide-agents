@@ -4,7 +4,44 @@
 
 Release journal for `universal-ide-agents`.
 
-This file follows Semantic Versioning and records meaningful changes to the shared VS Code asset library.
+This file follows Semantic Versioning and records meaningful changes to the shared VS Code, Claude Code, and Antigravity asset library.
+
+---
+
+## 2.0.0 · 2026-11-18
+
+<div>
+
+[![Release](https://img.shields.io/badge/release-2.0.0-0F766E?style=for-the-badge)](./README.md) [![Target: Multi-IDE](https://img.shields.io/badge/target-Antigravity%2C%20Claude%20Code%20%26%20VS%20Code-4f46e5?style=for-the-badge&logo=google&logoColor=white)](./docs/asset-catalog.md) [![Domain](https://img.shields.io/badge/domain-Data%20Engineering%20%26%20Lakehouse-1D4ED8?style=for-the-badge)](./core/playbooks/data-engineering-production-playbook.md)
+
+</div>
+
+### Added
+
+- **Single Source of Truth Architecture (`core/`) & Multi-IDE Compiler (`scripts/validate_and_build.py`)**:
+  - Centralizes canonical definitions in `core/agents/`, `core/skills/`, `core/rules/`, `core/mcp/`, `core/hooks/`, and `core/playbooks/`.
+  - Automatically validates YAML frontmatter, Antigravity `<= 12,000` character limits, zero Mermaid diagrams, and zero forbidden client terms (`harvester/schema/sanitization_rules.json`), compiling output mirrors to `.agents/` (Antigravity), `.claude/` (Claude Code), and `.github/` (VS Code Copilot).
+- **Periodic Knowledge & Skill Harvester (`scripts/harvest.py` & `harvester/`)**:
+  - Incremental SHA-256 scanner across local project directories, course notes, and IDE memories (`~/.claude/projects/*/memory/`, `~/.gemini/antigravity-ide/knowledge/`).
+  - Implements the procedural memory consolidation ETL pipeline (`CREATE` / `UPDATE` / `INVALIDATE`) with client term pre-screening into `harvester/inbox/<YYYY-MM-DD>/harvest_report.md`.
+- **11 Canonical Agents (`core/agents/`)**:
+  - **Data Engineering**: `data-engineer`, `data-modeling-architect`, `data-security-auditor`, `pipeline-reviewer` (with anti-false-positive evidence tagging `[VERIFICADO]` vs `[INFERIDO]` and 4-tier taxonomy `DEFECTO` / `CONDICIONAL` / `ENDURECIMIENTO` / `PROPUESTA`), and `pipeline-incident-triage`.
+  - **Core Lifecycle**: `planner`, `implementer`, `code-reviewer`, `docs-steward`, `tdd-cycle`, and `knowledge-harvester`.
+- **25 Modular Data Engineering & Core Skills (`core/skills/<category>/<name>/SKILL.md`)**:
+  - **MongoDB Big Data & Transactional**: `mongodb-schema-design`, `mongodb-query-optimizer`, `mongodb-sharding-operations` (2-phase empty collection pre-split), `mongodb-bigdata-patterns` (safe `$merge` pipelines), `mongodb-rolling-window-precalc` (single raw read per day, `$setWindowFields` P95 histograms, monotonic `lastSeen`), and `mongodb-csfle-governance` (`_PLAIN` / `_HASH` / `_ENCRYPTED` + `crypt_shared` errors `31127`, `9710000`, `17217`).
+  - **DuckDB / DuckLake, Lakehouse & CDC Streaming**: `duckdb-parquet-optimization` (*Min-Max Zone Maps* vs Hive over-partitioning, single-writer lock), `ducklake-medallion-architecture`, `mongodb-to-duckdb-cdc-offload` (`QUALIFY ROW_NUMBER()` deduplication & tombstones), `pyspark-delta-iceberg-lakehouse` (*Liquid Clustering*, *AQE*, *Deletion Vectors*, *CDF*), and `kafka-debezium-cdc-streaming` (log-based CDC, PK partitioning, `BACKWARD_TRANSITIVE` Schema Registry, Outbox Pattern, DLQ).
+  - **Dagster & Orchestration**: `dagster-asset-architecture` (`dg.EnvVar`, `dg check defs`), `dagster-duckdb-dbt-integration` (`concurrency_key`), `medallion-safety-guards` (5 production safety guards), `airflow-dagster-interoperability` (TaskFlow + Astronomer Cosmos), and `ai-pipeline-incident-triage`.
+  - **dbt & Data Quality Governance**: `dbt-transactional-microbatch` (dbt 1.9+ `microbatch` + `lookback` + SCD2 snapshots), `dbt-contracts-and-unit-tests` (`contract: {enforced: true}` + native `unit_tests:`), `dbt-duckdb-lakehouse-patterns` (`union_by_name=true`), and `great-expectations-openlineage-quality` (GX 1.3+ & OpenLineage blast radius).
+  - **Data Modeling & MDM**: `sql-to-nosql-modeling` (with `scripts/audit_relational_schema.py`), `attribute-pattern-eav`, `polymorphic-schema-design`, `schema-evolution-versioning`, `extended-reference-optimizer`, `polyglot-persistence-strategy`, and `data-mesh-and-mdm-governance` (tripartite 2:1 accounting consolidation without data loss).
+  - **Automation, Infra & Core**: `parallel-processing-patterns`, `docker-data-stack` (75% memory rule against OOM `exit 137`), `n8n-workflow-engineering` (stateless Hub-and-Spoke & static checks `S01..S05`), `ml-inference-pipeline-safety` (`sklearn.pipeline.Pipeline` serialization without `fit_transform` in production), `otel-pipeline-observability` (3-level OTel spans: `Module -> Process -> Operation`), `subagent-orchestration-patterns`, `knowledge-harvester`, and `skill-creator`.
+- **MCP Catalog, Deployment Profiles & Production Playbook**:
+  - Added `core/mcp/catalog.md` and `core/mcp/templates/data-eng-full.mcp.json` (`dbt-mcp`, `mcp-server-dagster`, `mcp-server-duckdb --read-only`, `mongodb-mcp-server`, `postgres-mcp`, `context7`).
+  - Added `profiles/` (`core.json`, `data-eng-full.json`, `data-eng-mongodb.json`, `data-eng-lakehouse.json`, `data-eng-n8n.json`).
+  - Added `core/playbooks/data-engineering-production-playbook.md` (`INC-01` through `INC-10`) and root `AGENTS.md`.
+
+### Changed
+
+- Upgraded `scripts/deploy-to-project.sh` to support `--target all|antigravity|claude|vscode` and `--profile <profile-id>` while preserving 100% backward compatibility with existing `.githubconfig/universal-ide-agents` submodule consumers.
 
 ---
 

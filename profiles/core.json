@@ -1,0 +1,8 @@
+{
+  "profileId": "core",
+  "description": "Perfil base de ingeniería de software, planificación, revisión sin falsos positivos, TDD, documentación y recolección de conocimiento.",
+  "agentCategories": ["core"],
+  "skillCategories": ["core"],
+  "ruleCategories": ["core"],
+  "mcpTemplates": ["github", "context7"]
+}

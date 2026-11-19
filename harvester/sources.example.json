@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0.0",
+  "description": "Configuración de ejemplo para el motor periódico Knowledge & Skill Harvester. Copia este archivo a harvester/sources.local.json (ignorado por Git) y ajusta tus rutas locales.",
+  "watchRoots": [
+    {
+      "id": "client-projects",
+      "path": "~/Desktop/sidis/Proyectos_por_cliente",
+      "category": "projects",
+      "maxDepth": 5
+    },
+    {
+      "id": "dagster-medallion-projects",
+      "path": "~/Desktop/sidis/proyectos_por_cliente_dagster_gitlab_[cliente]",
+      "category": "projects",
+      "maxDepth": 5
+    },
+    {
+      "id": "duckdb-dagster-course-project",
+      "path": "~/Desktop/Curso_docker_duckdb",
+      "category": "projects",
+      "maxDepth": 4
+    },
+    {
+      "id": "personal-projects",
+      "path": "~/Desktop/Proyectos",
+      "category": "projects",
+      "maxDepth": 4,
+      "excludeDirs": ["universal-ide-agents"]
+    },
+    {
+      "id": "ide-selection-benchmarks",
+      "path": "~/Desktop/SELECCION-IDE",
+      "category": "research",
+      "maxDepth": 3
+    },
+    {
+      "id": "study-programs-courses",
+      "path": "~/Desktop/PROGRAMAS DE ESTUDIO",
+      "category": "courses",
+      "maxDepth": 5
+    },
+    {
+      "id": "internal-courses",
+      "path": "~/Desktop/sidis/Cursos",
+      "category": "courses",
+      "maxDepth": 4
+    },
+    {
+      "id": "claude-project-memories",
+      "path": "~/.claude/projects",
+      "category": "agent-memory",
+      "maxDepth": 4
+    },
+    {
+      "id": "antigravity-ide-knowledge",
+      "path": "~/.gemini/antigravity-ide/knowledge",
+      "category": "agent-memory",
+      "maxDepth": 4
+    }
+  ],
+  "targetPatterns": [
+    ".agents/**/*.md",
+    ".agents/**/*.py",
+    ".claude/**/*.md",
+    ".claude/**/*.json",
+    ".github/agents/**/*.md",
+    ".github/skills/**/*.md",
+    ".github/instructions/**/*.md",
+    ".github/prompts/**/*.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "**/memory/*.md",
+    "**/fallos/*.md",
+    "**/ARQUITECTURA*.md",
+    "**/docs/standards/*.md"
+  ]
+}

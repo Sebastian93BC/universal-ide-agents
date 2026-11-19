@@ -1,0 +1,8 @@
+{
+  "profileId": "data-eng-mongodb",
+  "description": "Perfil especializado en cargas transaccionales y analíticas de alto volumen en MongoDB, Sharding, Pre-cálculo de ventanas móviles, CSFLE y Modelado Políglota.",
+  "agentCategories": ["core", "data-engineering"],
+  "skillCategories": ["core", "mongodb", "data-modeling", "automation-infra"],
+  "ruleCategories": ["core", "data-engineering"],
+  "mcpTemplates": ["mongodb", "postgres", "docker"]
+}

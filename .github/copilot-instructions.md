@@ -1,56 +1,17 @@
-# universal-ide-agents — Repository Guidance
+# GitHub Copilot & VS Code Instructions (`universal-ide-agents`)
 
-## Scope
+Consulta [AGENTS.md](../AGENTS.md) en la raíz del repositorio para la constitución completa del sistema.
 
-This repository is the canonical source of reusable VS Code customization assets.
+## 1. Activos Disponibles en `.github/`
 
-Current scope:
-- `.github/agents/*.agent.md`
-- `.github/instructions/*.instructions.md`
-- `.github/prompts/*.prompt.md`
-- `.github/hooks/*.json`
-- `.github/skills/*/SKILL.md`
-- `scripts/*.sh`
-- `docs/*.md`
+- **Agentes Personalizados (`.github/agents/*.agent.md`)**:
+  - Ingeniería de Datos: `@data-engineer`, `@data-modeling-architect`, `@data-security-auditor`, `@pipeline-reviewer`, `@pipeline-incident-triage`.
+  - Ciclo de Vida Core: `@planner`, `@implementer`, `@code-reviewer`, `@docs-steward`, `@tdd-cycle`, `@knowledge-harvester` (además de los agentes clásicos retrocompatibles `Planner`, `Feature Builder`, `Reviewer`, `Code Reviewer`, `Documentation Steward`, `Data Science Developer`).
+- **Skills Modulares (`.github/skills/<skill-name>/SKILL.md`)**: 25 skills especializadas en MongoDB, DuckDB/DuckLake, Dagster, dbt, PySpark/Delta/Iceberg, Kafka/Debezium, Great Expectations/OpenLineage, Modelado Políglota, Docker, n8n, OpenTelemetry y ML Inference.
+- **Instrucciones por Tipo de Archivo (`.github/instructions/*.instructions.md`)**: Reglas automáticas para SQL, Python, MongoDB, Dagster, dbt y documentación Markdown.
 
-- **Ignorar TO_DO.md**: El archivo `TO_DO.md` en la raíz está reservado exclusivamente para desarrolladores humanos. Los agentes de IA (Copilot, Claude Code, etc.) deben ignorarlo por completo y nunca leerlo, interpretarlo ni modificarlo.
-
-Out of scope for `v0.1.0`:
-- JetBrains, Zed, Cursor, Windsurf, or other editor-specific layouts (except GitHub Copilot and Claude Code)
-- Project-specific business rules or domain assumptions
-- Non-portable hook or script implementations
-
-## Authoring Rules
-
-- Keep all reusable AI assets in English.
-- Write frontmatter as valid YAML and make `description` specific enough to trigger correctly.
-- Prefer small, composable assets over large monolithic files.
-- Keep prompts, agents, hooks, instructions, and skills IDE-agnostic and project-agnostic.
-- Treat scripts as helper tooling for setup, sync, and context injection, not as product code.
-- Document any new asset in the README or asset catalog when it changes discoverability.
-
-
-## Naming Conventions
-
-- Agents: `Name.agent.md`
-- Instructions: `Name.instructions.md`
-- Prompts: `Name.prompt.md`
-- Skills: `.github/skills/<skill-name>/SKILL.md`
-- Hooks: descriptive `.json` files under `.github/hooks/`
-- Shell tooling: kebab-case under `scripts/`
-
-## Quality Bar
-
-- README and CHANGELOG should feel editorial, but still render cleanly on GitHub without custom CSS.
-- Hook commands must point to scripts that exist in this repository.
-- Scripts should be POSIX-friendly where practical and avoid unnecessary dependencies.
-- Do not describe unsupported editor integrations as if they already exist.
-- Use Semantic Versioning and update the CHANGELOG whenever shared assets change meaningfully.
-
-## Contribution Focus
-
-When you extend this repository, prioritize one of these outcomes:
-- Make an existing VS Code asset easier to reuse across projects.
-- Improve discoverability of the asset catalog.
-- Add safe automation for installing, syncing, or validating shared assets.
-- Strengthen documentation for teams consuming the repository as a secondary configuration source.
+## 2. Reglas Esenciales
+- Edita siempre los activos fuente en `core/` y ejecuta `python3 scripts/validate_and_build.py`.
+- Nunca generes bloques `mermaid`; usa SVG o tablas Markdown.
+- Mantén `camelCase` en archivos JSON de configuración y preserva `PREPROCESS_CONFIG` en `.github/hooks/context.json`.
+- Ignora `TO_DO.md`; gestiona todas las tareas en `plans/registry.md`.

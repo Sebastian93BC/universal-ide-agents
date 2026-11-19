@@ -1,0 +1,8 @@
+{
+  "profileId": "data-eng-n8n",
+  "description": "Perfil especializado en orquestación sin estado Hub-and-Spoke con n8n, MongoDB, telemetría OpenTelemetry y revisión estática de flujos.",
+  "agentCategories": ["core", "data-engineering"],
+  "skillCategories": ["core", "mongodb", "automation-infra"],
+  "ruleCategories": ["core", "data-engineering"],
+  "mcpTemplates": ["mongodb", "postgres", "docker"]
+}

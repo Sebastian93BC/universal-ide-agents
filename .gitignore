@@ -66,3 +66,8 @@ Thumbs.db
 # Ignore local plan
 plan_improvement.md
 tasks.txt
+
+# Harvester local state & private inbox reports
+harvester/sources.local.json
+harvester/state.local.json
+harvester/inbox/

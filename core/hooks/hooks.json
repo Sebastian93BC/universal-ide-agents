@@ -1,0 +1,19 @@
+{
+  "hooksVersion": "1.0.0",
+  "description": "Hooks deterministas de seguridad y calidad para pipelines de datos y mantenimiento del repositorio universal-ide-agents.",
+  "preToolUse": [
+    {
+      "id": "block-destructive-db-and-shell",
+      "matcher": "Bash|run_command",
+      "description": "Advierte o bloquea comandos destructivos sin confirmación explícita (dropDatabase, DROP TABLE, rm -rf sobre datos productivos o git push --force)."
+    }
+  ],
+  "postToolUse": [
+    {
+      "id": "validate-universal-ide-assets",
+      "matcher": "Edit|Write|MultiEdit",
+      "targetGlobs": ["core/**/*.md", "profiles/*.json", "harvester/schema/*.json"],
+      "command": "python3 scripts/validate_and_build.py --check-only"
+    }
+  ]
+}
