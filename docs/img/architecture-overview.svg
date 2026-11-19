@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 420" width="100%" height="100%" role="img" aria-label="Arquitectura Multi-IDE de universal-ide-agents">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="compilerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="harvesterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4c1d95"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <marker id="arrowCyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc"/>
+    </marker>
+    <marker id="arrowTeal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2dd4bf"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="920" height="420" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- Header -->
+  <text x="460" y="38" text-anchor="middle" fill="#f8fafc" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="18" font-weight="700" letter-spacing="0.5">
+    UNIVERSAL-IDE-AGENTS — ARQUITECTURA DE COMPILACIÓN MULTI-IDE
+  </text>
+  <text x="460" y="58" text-anchor="middle" fill="#94a3b8" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="12">
+    Fuente Única de Verdad (core/) compilada y validada automáticamente para 3 entornos de desarrollo con IA
+  </text>
+
+  <!-- Harvester Box (Left) -->
+  <g filter="url(#shadow)">
+    <rect x="28" y="102" width="175" height="190" rx="12" fill="url(#harvesterGrad)" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="115" y="130" text-anchor="middle" fill="#f5f3ff" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">Knowledge Harvester</text>
+    <text x="115" y="148" text-anchor="middle" fill="#ddd6fe" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10">scripts/harvest.py</text>
+    <line x1="46" y1="162" x2="185" y2="162" stroke="#8b5cf6" stroke-width="1"/>
+    <text x="46" y="184" fill="#ede9fe" font-family="system-ui, sans-serif" font-size="11">• Escaneo SHA-256</text>
+    <text x="46" y="205" fill="#ede9fe" font-family="system-ui, sans-serif" font-size="11">• Proyectos &amp; Cursos</text>
+    <text x="46" y="226" fill="#ede9fe" font-family="system-ui, sans-serif" font-size="11">• Sanitización PII</text>
+    <text x="46" y="247" fill="#ede9fe" font-family="system-ui, sans-serif" font-size="11">• Consolidación ETL</text>
+    <rect x="46" y="262" width="139" height="20" rx="6" fill="#2e1065"/>
+    <text x="115" y="276" text-anchor="middle" fill="#c4b5fd" font-family="ui-monospace, monospace" font-size="9.5">harvester/inbox/</text>
+  </g>
+
+  <!-- Arrow Harvester -> Core -->
+  <path d="M 203 197 L 243 197" stroke="#c084fc" stroke-width="2" fill="none" marker-end="url(#arrowPurple)"/>
+
+  <!-- Core Box (Center-Left) -->
+  <g filter="url(#shadow)">
+    <rect x="250" y="88" width="235" height="218" rx="12" fill="url(#coreGrad)" stroke="#60a5fa" stroke-width="1.8"/>
+    <text x="367" y="116" text-anchor="middle" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700">core/ (Single Source of Truth)</text>
+    <line x1="268" y1="128" x2="467" y2="128" stroke="#3b82f6" stroke-width="1"/>
+
+    <!-- Core items grid -->
+    <rect x="268" y="140" width="94" height="36" rx="7" fill="#172554" stroke="#3b82f6" stroke-width="1"/>
+    <text x="315" y="156" text-anchor="middle" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="11" font-weight="700">11 Agentes</text>
+    <text x="315" y="170" text-anchor="middle" fill="#bfdbfe" font-family="ui-monospace, monospace" font-size="9">core/agents/</text>
+
+    <rect x="373" y="140" width="94" height="36" rx="7" fill="#172554" stroke="#3b82f6" stroke-width="1"/>
+    <text x="420" y="156" text-anchor="middle" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="11" font-weight="700">35 Skills</text>
+    <text x="420" y="170" text-anchor="middle" fill="#bfdbfe" font-family="ui-monospace, monospace" font-size="9">core/skills/</text>
+
+    <rect x="268" y="186" width="94" height="36" rx="7" fill="#172554" stroke="#3b82f6" stroke-width="1"/>
+    <text x="315" y="202" text-anchor="middle" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="11" font-weight="700">6 Reglas</text>
+    <text x="315" y="216" text-anchor="middle" fill="#bfdbfe" font-family="ui-monospace, monospace" font-size="9">core/rules/</text>
+
+    <rect x="373" y="186" width="94" height="36" rx="7" fill="#172554" stroke="#3b82f6" stroke-width="1"/>
+    <text x="420" y="202" text-anchor="middle" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="11" font-weight="700">MCP &amp; Hooks</text>
+    <text x="420" y="216" text-anchor="middle" fill="#bfdbfe" font-family="ui-monospace, monospace" font-size="9">mcp/ · hooks/</text>
+
+    <rect x="268" y="232" width="199" height="36" rx="7" fill="#172554" stroke="#3b82f6" stroke-width="1"/>
+    <text x="367" y="248" text-anchor="middle" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="11" font-weight="700">Playbooks de Producción</text>
+    <text x="367" y="262" text-anchor="middle" fill="#bfdbfe" font-family="ui-monospace, monospace" font-size="9">core/playbooks/ (INC-01..INC-10)</text>
+
+    <text x="367" y="294" text-anchor="middle" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="10">Editar siempre aquí · Nunca en salidas compiladas</text>
+  </g>
+
+  <!-- Arrow Core -> Compiler -->
+  <path d="M 485 197 L 523 197" stroke="#38bdf8" stroke-width="2" fill="none" marker-end="url(#arrowCyan)"/>
+
+  <!-- Compiler Box (Center-Right) -->
+  <g filter="url(#shadow)">
+    <rect x="530" y="138" width="132" height="118" rx="12" fill="url(#compilerGrad)" stroke="#5eead4" stroke-width="1.5"/>
+    <text x="596" y="164" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Validador &amp;</text>
+    <text x="596" y="180" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Compilador</text>
+    <text x="596" y="199" text-anchor="middle" fill="#ccfbf1" font-family="ui-monospace, monospace" font-size="9">validate_and_build.py</text>
+    <text x="596" y="220" text-anchor="middle" fill="#e0f2fe" font-family="system-ui, sans-serif" font-size="9.5">YAML · ≤12k chars</text>
+    <text x="596" y="236" text-anchor="middle" fill="#e0f2fe" font-family="system-ui, sans-serif" font-size="9.5">0 Mermaid · 0 PII</text>
+  </g>
+
+  <!-- Arrows Compiler -> 3 IDEs -->
+  <path d="M 662 172 C 685 172, 685 124, 710 124" stroke="#2dd4bf" stroke-width="2" fill="none" marker-end="url(#arrowTeal)"/>
+  <path d="M 662 197 L 710 197" stroke="#2dd4bf" stroke-width="2" fill="none" marker-end="url(#arrowTeal)"/>
+  <path d="M 662 222 C 685 222, 685 270, 710 270" stroke="#2dd4bf" stroke-width="2" fill="none" marker-end="url(#arrowTeal)"/>
+
+  <!-- Target 1: Antigravity -->
+  <g filter="url(#shadow)">
+    <rect x="717" y="92" width="176" height="64" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="805" y="116" text-anchor="middle" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Antigravity / Gemini CLI</text>
+    <text x="805" y="135" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace, monospace" font-size="10">.agents/ · AGENTS.md</text>
+  </g>
+
+  <!-- Target 2: Claude Code -->
+  <g filter="url(#shadow)">
+    <rect x="717" y="165" width="176" height="64" rx="10" fill="#1e293b" stroke="#fb923c" stroke-width="1.5"/>
+    <text x="805" y="189" text-anchor="middle" fill="#fb923c" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Claude Code</text>
+    <text x="805" y="208" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace, monospace" font-size="10">.claude/ · CLAUDE.md</text>
+  </g>
+
+  <!-- Target 3: VS Code Copilot -->
+  <g filter="url(#shadow)">
+    <rect x="717" y="238" width="176" height="64" rx="10" fill="#1e293b" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="805" y="262" text-anchor="middle" fill="#c4b5fd" font-family="system-ui, sans-serif" font-size="12" font-weight="700">VS Code / Copilot</text>
+    <text x="805" y="281" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace, monospace" font-size="10">.github/ (agents, skills)</text>
+  </g>
+
+  <!-- Bottom Deploy Bar -->
+  <g filter="url(#shadow)">
+    <rect x="28" y="334" width="865" height="58" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <text x="460" y="358" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12" font-weight="700">
+      Despliegue Modular hacia Proyectos Consumidores · scripts/deploy-to-project.sh (--dry-run | --target | --profile)
+    </text>
+    <text x="460" y="378" text-anchor="middle" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10.5">
+      Perfiles: core  ·  data-eng-full  ·  data-eng-mongodb  ·  data-eng-lakehouse  ·  data-eng-n8n
+    </text>
+  </g>
+</svg>
