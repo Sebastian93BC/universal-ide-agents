@@ -2,7 +2,9 @@
   "mcpServers": {
     "dbt": {
       "command": "uvx",
-      "args": ["dbt-mcp"],
+      "args": [
+        "dbt-mcp"
+      ],
       "env": {
         "DBT_PROJECT_DIR": "${DBT_PROJECT_DIR}",
         "DBT_PROFILES_DIR": "${DBT_PROFILES_DIR}"
@@ -10,7 +12,13 @@
     },
     "dagster": {
       "command": "uvx",
-      "args": ["--from", "dagster-dg-cli", "dg", "mcp", "serve"],
+      "args": [
+        "--from",
+        "dagster-dg-cli",
+        "dg",
+        "mcp",
+        "serve"
+      ],
       "env": {
         "DAGSTER_HOME": "${DAGSTER_HOME}"
       }
@@ -26,7 +34,11 @@
     },
     "mongodb": {
       "command": "npx",
-      "args": ["-y", "mongodb-mcp-server", "--readOnly"],
+      "args": [
+        "-y",
+        "mongodb-mcp-server",
+        "--readOnly"
+      ],
       "env": {
         "MDB_MCP_CONNECTION_STRING": "${MONGODB_READONLY_URI}"
       }
@@ -41,7 +53,10 @@
     },
     "context7": {
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"]
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
     }
   }
 }

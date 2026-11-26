@@ -1,16 +1,8 @@
 {
   "profileId": "data-eng-full",
-  "description": "Suite completa de Ingeniería de Datos para Big Data y Datos Transaccionales: MongoDB, DuckDB/DuckLake, Dagster, dbt, PySpark/Delta/Iceberg, Kafka/Debezium, Great Expectations/OpenLineage, Docker y n8n.",
-  "agentCategories": ["core", "data-engineering"],
-  "skillCategories": [
-    "core",
-    "mongodb",
-    "duckdb-lakehouse",
-    "dagster-orchestration",
-    "dbt-transformation",
-    "data-modeling",
-    "automation-infra"
-  ],
-  "ruleCategories": ["core", "data-engineering"],
-  "mcpTemplates": ["dbt", "dagster", "duckdb", "mongodb", "postgres", "docker"]
+  "description": "Todo lo desplegable de ingeniería de datos (base, n8n, Dagster/DuckDB, lakehouse, Docker, ML e infraestructura). Útil para explorar; en un proyecto real combina data-eng-base con su herramienta.",
+  "extends": ["data-eng-n8n", "data-eng-lakehouse"],
+  "skillCategories": ["automation-infra"],
+  "ruleCategories": ["data-engineering"],
+  "mcpTemplates": ["dbt", "dagster", "duckdb", "mongodb", "postgres", "context7"]
 }

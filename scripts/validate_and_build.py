@@ -21,6 +21,8 @@ import re
 import shutil
 import sys
 
+import uia_lib
+
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CORE_DIR = REPO_ROOT / "core"
@@ -28,6 +30,7 @@ SCHEMA_FILE = REPO_ROOT / "harvester" / "schema" / "sanitization_rules.json"
 
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 MERMAID_RE = re.compile(r"```\s*mermaid\b", re.IGNORECASE)
+VALID_TRIGGERS = {"always_on", "model_decision", "glob", "manual"}
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:
@@ -116,6 +119,27 @@ def validate_core_assets(rules: dict) -> tuple[list[str], dict[str, int]]:
         errors=errors,
     )
 
+  # 3b. Triggers válidos (Antigravity descarta en silencio una regla sin trigger válido)
+  for rule_file in sorted((CORE_DIR / "rules").rglob("*.rule.md")):
+    fm = parse_frontmatter(rule_file.read_text(encoding="utf-8"))
+    rel = rule_file.relative_to(REPO_ROOT)
+    trigger = fm.get("trigger")
+    if trigger not in VALID_TRIGGERS:
+      errors.append(f"[{rel}] trigger '{trigger}' no válido; usa uno de {sorted(VALID_TRIGGERS)}.")
+    elif trigger == "glob" and not (fm.get("globs") or fm.get("glob")):
+      errors.append(f"[{rel}] trigger 'glob' exige 'globs'.")
+
+  # 3c. Nombres únicos entre categorías (el compilado los aplana por nombre)
+  for kind, pattern, suffix in (("agente", "agents/*/*.agent.md", ".agent.md"),
+                                ("skill", "skills/*/*/SKILL.md", None),
+                                ("regla", "rules/*/*.rule.md", ".rule.md")):
+    seen: dict[str, Path] = {}
+    for f in sorted(CORE_DIR.glob(pattern)):
+      name = f.parent.name if suffix is None else f.name[: -len(suffix)]
+      if name in seen:
+        errors.append(f"[{f.relative_to(REPO_ROOT)}] {kind} '{name}' repetido (ya está en {seen[name].relative_to(REPO_ROOT)}).")
+      seen[name] = f
+
   # 4. Validate Playbooks
   for pb_file in sorted((CORE_DIR / "playbooks").rglob("*.md")):
     counts["playbooks"] += 1
@@ -190,80 +214,41 @@ def _validate_markdown_file(
   return fm
 
 
-def build_multi_ide_targets() -> None:
-  """Compila los activos de core/ hacia .agents/, .claude/ y .github/."""
-  agents_dir = REPO_ROOT / ".agents"
-  claude_dir = REPO_ROOT / ".claude"
-  github_dir = REPO_ROOT / ".github"
+def build_multi_ide_targets() -> int:
+  """Compila todo core/ (incluidos los activos del hub) hacia .agents/, .claude/ y .github/.
 
-  # Prepare target subdirectories (clean all managed compiled folders before copy)
-  for target_sub in [
-      agents_dir / "skills",
-      agents_dir / "rules",
-      agents_dir / "agents",
-      claude_dir / "skills",
-      claude_dir / "rules",
-      claude_dir / "agents",
-      github_dir / "skills",
-      github_dir / "instructions",
-      github_dir / "agents",
-  ]:
-    if target_sub.exists():
-      shutil.rmtree(target_sub)
-    target_sub.mkdir(parents=True, exist_ok=True)
+  Usa la misma función de compilación que deploy.py, así lo desplegado en un
+  proyecto es idéntico a lo compilado aquí. Sincroniza por diferencias: solo
+  escribe lo que cambió y borra lo que sobra (incluidas las copias de conflicto
+  de iCloud, "SKILL 2.md"). No borra y recrea carpetas enteras, porque en un
+  Escritorio sincronizado eso es lo que genera esas copias.
+  """
+  files = uia_lib.render(uia_lib.full_selection())
+  written = 0
+  for rel, data in sorted(files.items()):
+    dest = REPO_ROOT / rel
+    if dest.is_file() and dest.read_bytes() == data:
+      continue
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_name(dest.name + ".tmp")
+    tmp.write_bytes(data)
+    tmp.replace(dest)
+    written += 1
 
-  # 1. Compile Skills (<skill-name>/SKILL.md + scripts/ + references/)
-  for skill_file in sorted((CORE_DIR / "skills").rglob("SKILL.md")):
-    skill_src_dir = skill_file.parent
-    skill_name = skill_src_dir.name
-    for dest_root in [
-        agents_dir / "skills" / skill_name,
-        claude_dir / "skills" / skill_name,
-        github_dir / "skills" / skill_name,
-    ]:
-      shutil.copytree(skill_src_dir, dest_root, dirs_exist_ok=True)
-
-  # 2. Compile Agents
-  for agent_file in sorted((CORE_DIR / "agents").rglob("*.agent.md")):
-    base_name = agent_file.name.replace(".agent.md", "")
-    content = agent_file.read_text(encoding="utf-8")
-
-    # .agents/agents/<name>.md
-    (agents_dir / "agents" / f"{base_name}.md").write_text(
-        content, encoding="utf-8"
-    )
-    # .claude/agents/<name>.md
-    (claude_dir / "agents" / f"{base_name}.md").write_text(
-        content, encoding="utf-8"
-    )
-    # .github/agents/<name>.agent.md
-    (github_dir / "agents" / f"{base_name}.agent.md").write_text(
-        content, encoding="utf-8"
-    )
-
-  # 3. Compile Rules / Instructions
-  for rule_file in sorted((CORE_DIR / "rules").rglob("*.rule.md")):
-    base_name = rule_file.name.replace(".rule.md", "")
-    content = rule_file.read_text(encoding="utf-8")
-
-    # .agents/rules/<name>.md
-    (agents_dir / "rules" / f"{base_name}.md").write_text(
-        content, encoding="utf-8"
-    )
-    # .claude/rules/<name>.md
-    (claude_dir / "rules" / f"{base_name}.md").write_text(
-        content, encoding="utf-8"
-    )
-    # .github/instructions/<name>.instructions.md
-    (github_dir / "instructions" / f"{base_name}.instructions.md").write_text(
-        content, encoding="utf-8"
-    )
-
-  # 4. Copy MCP Template Examples
-  mcp_template = CORE_DIR / "mcp" / "templates" / "data-eng-full.mcp.json"
-  if mcp_template.exists():
-    shutil.copy2(mcp_template, agents_dir / "mcp_config.example.json")
-    shutil.copy2(mcp_template, claude_dir / "mcp.example.json")
+  removed = 0
+  for rel, path in uia_lib.managed_files_on_disk(REPO_ROOT).items():
+    if rel not in files:
+      path.unlink()
+      removed += 1
+  for target in uia_lib.TARGETS:
+    for sub in uia_lib.MANAGED_SUBDIRS[target]:
+      base = REPO_ROOT / uia_lib.TARGET_ROOTS[target] / sub
+      if base.is_dir():
+        for d in sorted((p for p in base.rglob("*") if p.is_dir()), key=lambda p: len(p.parts), reverse=True):
+          if not any(d.iterdir()):
+            d.rmdir()
+  print(f"[info] {written} archivos escritos, {removed} sobrantes borrados.")
+  return len(files)
 
 
 def main() -> int:
@@ -293,8 +278,8 @@ def main() -> int:
   print("[OK] Todos los activos en core/ cumplen YAML, límites <=12k chars, cero Mermaid y cero términos prohibidos.")
 
   if not args.check_only:
-    build_multi_ide_targets()
-    print("[OK] Activos compilados exitosamente hacia .agents/, .claude/ y .github/.")
+    n_files = build_multi_ide_targets()
+    print(f"[OK] {n_files} archivos compilados hacia .agents/, .claude/ y .github/.")
 
   return 0
 

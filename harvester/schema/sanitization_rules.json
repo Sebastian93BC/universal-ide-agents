@@ -27,6 +27,23 @@
   "forbiddenPathPatterns": [
     "/Users/[A-Za-z0-9._-]+/"
   ],
+  "sensitiveScan": {
+    "description": "Configuración de scripts/scan_sensitive.py. excludePaths no se revisa (define los términos); reportOnlyPaths se revisa e informa sin bloquear (registro interno con historial).",
+    "excludePaths": [
+      "harvester/schema/sanitization_rules.json"
+    ],
+    "reportOnlyPaths": [
+      "plans/"
+    ],
+    "allowedEmails": [
+      "noreply@anthropic.com"
+    ],
+    "allowedEmailDomains": [
+      "example.com",
+      "example.org"
+    ],
+    "allowedMatches": []
+  },
   "provenanceHierarchy": [
     {
       "level": 1,

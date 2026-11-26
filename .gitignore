@@ -71,3 +71,11 @@ tasks.txt
 harvester/sources.local.json
 harvester/state.local.json
 harvester/inbox/
+
+# Copias de conflicto de iCloud / Finder ("SKILL 2.md", "init_skill 3.py").
+# El Escritorio está sincronizado; make check también las detecta.
+* [0-9].*
+* [0-9]
+
+# Originales sin sanear de planes (nombran clientes; el repositorio es público)
+plans/.local/

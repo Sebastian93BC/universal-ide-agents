@@ -1,0 +1,15 @@
+{
+  "profileId": "data-eng-dagster-duckdb",
+  "description": "Herramienta de ETL Dagster con DuckDB y Parquet (Medallion) sobre la base de datos, con MongoDB como capa de publicación.",
+  "extends": ["data-eng-base"],
+  "skills": [
+    "dagster-asset-architecture",
+    "dagster-duckdb-dbt-integration",
+    "medallion-safety-guards",
+    "duckdb-parquet-optimization",
+    "ducklake-medallion-architecture",
+    "mongodb-to-duckdb-cdc-offload"
+  ],
+  "rules": ["duckdb-dagster-dbt-invariants"],
+  "mcpTemplates": ["dagster", "duckdb"]
+}

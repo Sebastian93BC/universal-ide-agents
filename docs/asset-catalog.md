@@ -1,10 +1,10 @@
-# Catálogo Maestro de Activos (`universal-ide-agents` v2.0.0)
+# Catálogo Maestro de Activos (`universal-ide-agents` v3.0.0)
 
-Todos los activos de este catálogo tienen su fuente canónica en `core/` y son compilados y validados por `scripts/validate_and_build.py` hacia **Antigravity (`.agents/`)**, **Claude Code (`.claude/`)** y **VS Code GitHub Copilot (`.github/`)**.
+Todos los activos de este catálogo tienen su fuente canónica en `core/` y son compilados y validados por `scripts/validate_and_build.py` hacia **Antigravity (`.agents/`)**, **Claude Code (`.claude/`)** y **VS Code GitHub Copilot (`.github/`)**. Qué llega a cada proyecto lo decide su perfil (sección 3); los activos de la categoría **Hub** solo existen en este repositorio.
 
 ---
 
-## 1. Agentes Especializados (11 Agentes Canónicos + Retrocompatibles)
+## 1. Agentes Especializados (11 Agentes Canónicos)
 
 | Categoría | Agente (`core/agents/`) | Rol Principal | Modo de Herramientas |
 | :--- | :--- | :--- | :--- |
@@ -18,11 +18,11 @@ Todos los activos de este catálogo tienen su fuente canónica en `core/` y son 
 | **Core Lifecycle** | `code-reviewer` | Revisión de código general y de datos con citas `archivo:línea` y taxonomía estricta de 4 niveles. | Lectura y Análisis (`read`, `search`) |
 | **Core Lifecycle** | `docs-steward` | Gobernanza documental, sincronización de catálogos, CHANGELOG y diagramación estricta en SVG / tablas (cero Mermaid). | Documentación (`read`, `search`, `edit`) |
 | **Core Lifecycle** | `tdd-cycle` | Ciclo disciplinado Red-Green-Refactor (`pytest`, `dbt unit_tests:`, `Great Expectations`). | Completo (`read`, `search`, `edit`, `execute`) |
-| **Core Lifecycle** | `knowledge-harvester` | Curador de memoria procedural: procesa reportes de `scripts/harvest.py`, sanitiza datos de clientes y consolida (`CREATE`/`UPDATE`/`INVALIDATE`). | Completo (`read`, `search`, `edit`, `execute`) |
+| **Core Lifecycle** | `knowledge-harvester` | Dos modos. **Cierre de tarea** (proyecto): consolida el conocimiento de la tarea en el del proyecto, con las tres rutas recibidas por argumento (contrato con `dfa`, [contrato-template-dfa.md](./contrato-template-dfa.md)). **Hub**: procesa los reportes de `scripts/harvest.py` y consolida en `core/` (`CREATE`/`UPDATE`/`INVALIDATE`). | Completo (`read`, `search`, `edit`, `execute`) |
 
 ---
 
-## 2. Catálogo de 25 Skills Modulares (`SKILL.md`)
+## 2. Catálogo de 36 Skills Modulares (`SKILL.md`)
 
 | Categoría | Skill (`core/skills/<cat>/<name>/SKILL.md`) | Tecnologías y Problemas que Resuelve |
 | :--- | :--- | :--- |
@@ -59,14 +59,16 @@ Todos los activos de este catálogo tienen su fuente canónica en `core/` y son 
 | **Automatización, Infra & Core** | `ml-inference-pipeline-safety` | Prohibición de `fit_transform` en producción, serialización de `sklearn.pipeline.Pipeline` con `joblib` y validación de contrato de features. |
 | **Automatización, Infra & Core** | `otel-pipeline-observability` | Jerarquía de 3 niveles de Spans OpenTelemetry (`Módulo -> Proceso -> Operación`), sanitización PII y paneles Sistema vs Calidad. |
 | **Automatización, Infra & Core** | `subagent-orchestration-patterns` | Los 5 patrones de orquestación multi-agente y aislamiento de contexto (*Context Engineering*). |
-| **Automatización, Infra & Core** | `knowledge-harvester` | Operación del motor periódico `scripts/harvest.py` y consolidación ETL de memoria procedural (`CREATE`/`UPDATE`/`INVALIDATE`). |
-| **Automatización, Infra & Core** | `skill-creator` | Estándar de creación de skills multi-IDE (`<= 12,000` chars, YAML frontmatter, progressive disclosure). |
+| **Core** | `session-handoff` | Nota de traspaso al cerrar una sesión: dónde quedó, qué se decidió (incluido lo rechazado), siguiente paso y preguntas abiertas, escrita en la tarea para la siguiente sesión o el otro IDE. |
+| **Hub (solo este repositorio)** | `knowledge-harvester` | Operación del motor periódico `scripts/harvest.py` y consolidación ETL de memoria procedural (`CREATE`/`UPDATE`/`INVALIDATE`). |
+| **Hub (solo este repositorio)** | `skill-creator` | Estándar de creación de skills multi-IDE (`<= 12,000` chars, YAML frontmatter, progressive disclosure). |
 
 ---
 
-## 3. Reglas, Perfiles, MCP y Playbooks
+## 3. Reglas, Perfiles, Hook, MCP y Playbooks
 
-- **Reglas (`core/rules/`)**: `diagramming-svg`, `evidence-verification`, `planning-and-versioning`, `mongodb-bson-and-merge-invariants`, `duckdb-dagster-dbt-invariants`, `python-env-and-pipeline-safety`.
-- **Perfiles de Despliegue (`profiles/`)**: `core.json`, `data-eng-full.json`, `data-eng-mongodb.json`, `data-eng-lakehouse.json`, `data-eng-n8n.json`.
-- **Catálogo y Plantillas MCP**: [core/mcp/catalog.md](./core/mcp/catalog.md) y `core/mcp/templates/data-eng-full.mcp.json`.
-- **Playbook de Producción**: [core/playbooks/data-engineering-production-playbook.md](./core/playbooks/data-engineering-production-playbook.md).
+- **Reglas (`core/rules/`)**: núcleo `diagramming-svg`, `evidence-verification` y `limites-tres-niveles` (siete límites en tres niveles, cada uno con su comprobación en el guardián); ingeniería de datos `mongodb-bson-and-merge-invariants`, `duckdb-dagster-dbt-invariants` y `python-env-and-pipeline-safety`; hub `planning-and-versioning`.
+- **Hook (`core/hooks/`)**: `universal-ide-agents-guard.py`, guardián `PreToolUse` de Claude Code que aplica `limites-tres-niveles`. Se despliega en `.claude/hooks/` y lo conecta el `.claude/settings.json` del proyecto.
+- **Perfiles de despliegue (`profiles/`)**: `core`, `data-eng-base` (núcleo, MongoDB y modelado, sin herramienta de ETL), `data-eng-n8n`, `data-eng-dagster-duckdb`, `data-eng-lakehouse` y `data-eng-full`. Detalle en [multi-ide-consumption.md](./multi-ide-consumption.md), sección 2.
+- **Catálogo y plantillas MCP**: [core/mcp/catalog.md](../core/mcp/catalog.md) y `core/mcp/templates/data-eng-full.mcp.json`, filtrada por perfil al desplegar.
+- **Playbook de producción**: [core/playbooks/data-engineering-production-playbook.md](../core/playbooks/data-engineering-production-playbook.md).

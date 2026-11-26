@@ -14,9 +14,9 @@ Repositorio centralizado y **Fuente Única de Verdad** de **Agentes, Subagentes,
 
 <p>
   <img src="https://img.shields.io/badge/Agentes-11-1d4ed8?style=flat-square" alt="11 Agentes" />
-  <img src="https://img.shields.io/badge/Skills-35-0d9488?style=flat-square" alt="35 Skills" />
-  <img src="https://img.shields.io/badge/Reglas-6-4f46e5?style=flat-square" alt="6 Reglas" />
-  <img src="https://img.shields.io/badge/Perfiles-5-0284c7?style=flat-square" alt="5 Perfiles" />
+  <img src="https://img.shields.io/badge/Skills-36-0d9488?style=flat-square" alt="36 Skills" />
+  <img src="https://img.shields.io/badge/Reglas-7-4f46e5?style=flat-square" alt="7 Reglas" />
+  <img src="https://img.shields.io/badge/Perfiles-6-0284c7?style=flat-square" alt="6 Perfiles" />
   <img src="https://img.shields.io/badge/Diagramas-SVG_Only-16a34a?style=flat-square" alt="SVG Only" />
 </p>
 
@@ -59,24 +59,26 @@ Repositorio centralizado y **Fuente Única de Verdad** de **Agentes, Subagentes,
 universal-ide-agents/
 ├── core/                              # FUENTE ÚNICA DE VERDAD (editar siempre aquí)
 │   ├── agents/                        # 11 agentes canónicos (Data Engineering + Core Lifecycle)
-│   ├── skills/                        # 35 skills modulares (SKILL.md + scripts/)
-│   ├── rules/                         # 6 reglas modulares de arquitectura, motores y diagramación SVG
+│   ├── skills/                        # 36 skills modulares (categoría hub: solo este repositorio)
+│   ├── rules/                         # 7 reglas, entre ellas los límites en tres niveles
 │   ├── mcp/                           # Catálogo y plantillas MCP (dbt, dagster, duckdb, mongodb, postgres)
-│   ├── hooks/                         # Hooks deterministas de validación pre/post herramienta
+│   ├── hooks/                         # Guardián PreToolUse que aplica los límites
 │   └── playbooks/                     # Playbook de incidentes reales de producción (INC-01..INC-10)
-├── profiles/                          # Perfiles de despliegue (core, data-eng-full, data-eng-mongodb, data-eng-lakehouse, data-eng-n8n)
+├── profiles/                          # Perfiles con extends: data-eng-base + herramienta (n8n, dagster-duckdb)
 ├── harvester/                         # Motor periódico Knowledge & Skill Harvester (ETL de memoria procedural)
 ├── scripts/
-│   ├── validate_and_build.py          # Valida YAML, <=12k chars, cero Mermaid, cero PII y compila a los 3 IDEs
-│   ├── harvest.py                     # Escáner incremental SHA-256 de proyectos, cursos y memorias locales
-│   └── deploy-to-project.sh           # Instalador multi-IDE retrocompatible (--target, --profile, --dry-run, --clean)
+│   ├── validate_and_build.py          # Valida core/ y compila a los 3 IDE
+│   ├── deploy.py · deploy-to-project.sh  # Despliegue por perfil; solo .agents/, .claude/, .github/
+│   ├── check.py                       # Verificador único (make check; --project tras desplegar)
+│   ├── scan_sensitive.py              # Escáner de datos sensibles
+│   └── harvest.py                     # Escáner incremental SHA-256 de proyectos, cursos y memorias locales
 ├── .agents/                           # Salida compilada para Antigravity / Gemini CLI
 ├── .claude/                           # Salida compilada para Claude Code
 ├── .github/                           # Salida compilada para VS Code / GitHub Copilot
 ├── docs/                              # Catálogo de activos, guía multi-IDE y diagramas SVG (docs/img/)
 ├── plans/                             # Control Room de planes, registro de tareas y base de conocimiento
-├── AGENTS.md                          # Constitución raíz multi-agente
-└── CLAUDE.md                          # Guía de entrada rápida para Claude Code
+├── AGENTS.md                          # Única fuente de instrucciones
+└── CLAUDE.md · GEMINI.md              # Punteros de una línea (@AGENTS.md)
 ```
 
 </details>
@@ -99,7 +101,8 @@ universal-ide-agents/
 ### A. Validar y Compilar Activos tras Editar `core/`
 
 ```bash
-python3 scripts/validate_and_build.py
+python3 scripts/validate_and_build.py   # compila
+make check                              # verificador único + pruebas
 ```
 
 ### B. Ejecutar el Recopilador Periódico (*Knowledge Harvester*)
@@ -120,27 +123,29 @@ python3 scripts/harvest.py --mark-processed
 ### C. Desplegar hacia un Proyecto Consumidor
 
 > [!TIP]
-> Ejecuta siempre primero con `--dry-run` para auditar qué archivos se copiarán o actualizarán en el proyecto destino.
+> El despliegue escribe solo bajo `.agents/`, `.claude/` y `.github/`, nunca toca `AGENTS.md`, `CLAUDE.md` ni `GEMINI.md`, y deja el manifiesto `.agents/universal-ide-agents.json`. Ejecuta primero con `--dry-run`.
 
 ```bash
-# 1. Previsualizar despliegue completo (Antigravity + Claude Code + VS Code)
-./scripts/deploy-to-project.sh --dry-run --target all --profile data-eng-full /ruta/a/tu/proyecto
-
-# 2. Aplicar despliegue
-./scripts/deploy-to-project.sh --target all --profile data-eng-full /ruta/a/tu/proyecto
+# Desde el proyecto, con el submódulo por HTTPS en .modules/universal-ide-agents
+.modules/universal-ide-agents/scripts/deploy-to-project.sh --dry-run --profile data-eng-n8n .
+.modules/universal-ide-agents/scripts/deploy-to-project.sh --profile data-eng-n8n .
+python3 .modules/universal-ide-agents/scripts/check.py --project .
 ```
 
 ---
 
 ## 4. Perfiles de Despliegue
 
-| Perfil | Enfoque | Uso Recomendado |
+Un perfil base agnóstico de la herramienta de ETL y la herramienta como añadido (`extends`). Se combinan con comas.
+
+| Perfil | Extiende | Uso |
 | :--- | :--- | :--- |
-| `core` | Ciclo de vida base (`planner`, `implementer`, `code-reviewer`, `tdd-cycle`, `docs-steward`) | Repositorios generales de software o utilidades. |
-| `data-eng-full` | Stack completo (11 agentes + 35 skills + 6 reglas + MCP) | Plataformas de datos end-to-end (OLTP + Lakehouse + Streaming). |
-| `data-eng-mongodb` | MongoDB Big Data, Sharding, CSFLE, `$merge` y ventanas móviles | Microservicios y pipelines transaccionales sobre MongoDB. |
-| `data-eng-lakehouse` | DuckDB/DuckLake, Parquet, Dagster, dbt, PySpark/Iceberg | Proyectos analíticos Medallion y ETL/ELT columnar. |
-| `data-eng-n8n` | Ingeniería de flujos n8n *Hub-and-Spoke* y automatización | Orquestación ligera y webhooks sin estado. |
+| `core` | — | Ciclo de vida, revisión, TDD, documentación, cierre de tarea, traspaso y límites. |
+| `data-eng-base` | `core` | Núcleo, MongoDB y modelado de datos, sin herramienta de ETL. |
+| `data-eng-n8n` | `data-eng-base` | Proyectos con módulos en n8n. |
+| `data-eng-dagster-duckdb` | `data-eng-base` | Proyectos con módulos en Dagster sobre DuckDB y Parquet. |
+| `data-eng-lakehouse` | `data-eng-dagster-duckdb` | Añade dbt, PySpark/Delta/Iceberg, Kafka/Debezium y Airflow. |
+| `data-eng-full` | `data-eng-n8n`, `data-eng-lakehouse` | Todo lo desplegable; para explorar. |
 
 ---
 
@@ -148,8 +153,9 @@ python3 scripts/harvest.py --mark-processed
 
 | Documento | Descripción |
 | :--- | :--- |
-| **[Catálogo Completo de Activos](./docs/asset-catalog.md)** | Inventario detallado de los 11 Agentes, 35 Skills, 6 Reglas y plantillas MCP. |
-| **[Guía de Consumo Multi-IDE](./docs/multi-ide-consumption.md)** | Cómo consumir y sincronizar el hub en Antigravity, Claude Code y VS Code Copilot. |
+| **[Catálogo Completo de Activos](./docs/asset-catalog.md)** | Inventario detallado de los 11 agentes, 36 skills, 7 reglas, el hook y las plantillas MCP. |
+| **[Guía de Consumo Multi-IDE](./docs/multi-ide-consumption.md)** | Qué se despliega, perfiles y qué carga cada IDE (comprobado). |
+| **[Contrato con `template-data-flow-automation`](./docs/contrato-template-dfa.md)** | Inclusión, despliegue, manifiesto, verificador, guardián y cierre de tarea con `dfa`. |
 | **[Playbook de Producción (`INC-01..INC-10`)](./core/playbooks/data-engineering-production-playbook.md)** | Resolución forense de incidentes reales en MongoDB, DuckDB, Dagster y dbt. |
 | **[Catálogo de Servidores MCP](./core/mcp/catalog.md)** | Configuración segura (`--read-only`) de MCPs para ingeniería de datos. |
 | **[Extracción Maestra de Conocimientos](./plans/knowledge/2026-11-18-project-courses-web-knowledge-extraction.md)** | Síntesis consolidada de proyectos, cursos e investigación técnica. |

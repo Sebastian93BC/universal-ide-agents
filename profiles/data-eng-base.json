@@ -1,0 +1,9 @@
+{
+  "profileId": "data-eng-base",
+  "description": "Base de ingeniería de datos agnóstica de la herramienta de ETL: núcleo, MongoDB y modelado de datos. Se combina con un perfil de herramienta (data-eng-n8n, data-eng-dagster-duckdb).",
+  "extends": ["core"],
+  "agentCategories": ["data-engineering"],
+  "skillCategories": ["mongodb", "data-modeling"],
+  "rules": ["mongodb-bson-and-merge-invariants", "python-env-and-pipeline-safety"],
+  "mcpTemplates": ["mongodb"]
+}

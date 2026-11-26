@@ -1,19 +1,20 @@
 {
-  "hooksVersion": "1.0.0",
-  "description": "Hooks deterministas de seguridad y calidad para pipelines de datos y mantenimiento del repositorio universal-ide-agents.",
+  "hooksVersion": "2.0.0",
+  "description": "Hooks de universal-ide-agents. El guardián se despliega en .claude/hooks/ y lo conecta el .claude/settings.json del proyecto (docs/contrato-template-dfa.md, sección 5).",
   "preToolUse": [
     {
-      "id": "block-destructive-db-and-shell",
-      "matcher": "Bash|run_command",
-      "description": "Advierte o bloquea comandos destructivos sin confirmación explícita (dropDatabase, DROP TABLE, rm -rf sobre datos productivos o git push --force)."
+      "id": "limites-tres-niveles",
+      "matcher": "Bash|Read|Grep|Glob|Edit|Write|MultiEdit|NotebookEdit",
+      "script": "core/hooks/universal-ide-agents-guard.py",
+      "deployedTo": ".claude/hooks/universal-ide-agents-guard.py",
+      "description": "Aplica la regla limites-tres-niveles: bloquea leer .env, imprimir secretos y borrar colecciones o tablas; pide confirmación para escribir en ambientes del cliente, desplegar, commit/push y editar fuera de la rama local."
     }
   ],
-  "postToolUse": [
+  "repositoryChecks": [
     {
-      "id": "validate-universal-ide-assets",
-      "matcher": "Edit|Write|MultiEdit",
-      "targetGlobs": ["core/**/*.md", "profiles/*.json", "harvester/schema/*.json"],
-      "command": "python3 scripts/validate_and_build.py --check-only"
+      "id": "make-check",
+      "targetGlobs": ["core/**", "profiles/*.json", "harvester/schema/*.json", "scripts/*.py"],
+      "command": "make check"
     }
   ]
 }

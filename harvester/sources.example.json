@@ -4,19 +4,19 @@
   "watchRoots": [
     {
       "id": "client-projects",
-      "path": "~/Desktop/sidis/Proyectos_por_cliente",
+      "path": "~/Desktop/clientes/proyectos",
       "category": "projects",
       "maxDepth": 5
     },
     {
       "id": "dagster-medallion-projects",
-      "path": "~/Desktop/sidis/proyectos_por_cliente_dagster_gitlab_[cliente]",
+      "path": "~/Desktop/clientes/proyectos_dagster",
       "category": "projects",
       "maxDepth": 5
     },
     {
       "id": "duckdb-dagster-course-project",
-      "path": "~/Desktop/Curso_docker_duckdb",
+      "path": "~/Desktop/cursos/docker_duckdb",
       "category": "projects",
       "maxDepth": 4
     },
@@ -25,23 +25,25 @@
       "path": "~/Desktop/Proyectos",
       "category": "projects",
       "maxDepth": 4,
-      "excludeDirs": ["universal-ide-agents"]
+      "excludeDirs": [
+        "universal-ide-agents"
+      ]
     },
     {
       "id": "ide-selection-benchmarks",
-      "path": "~/Desktop/SELECCION-IDE",
+      "path": "~/Desktop/investigacion/seleccion-ide",
       "category": "research",
       "maxDepth": 3
     },
     {
       "id": "study-programs-courses",
-      "path": "~/Desktop/PROGRAMAS DE ESTUDIO",
+      "path": "~/Desktop/cursos/programas",
       "category": "courses",
       "maxDepth": 5
     },
     {
       "id": "internal-courses",
-      "path": "~/Desktop/sidis/Cursos",
+      "path": "~/Desktop/cursos/internos",
       "category": "courses",
       "maxDepth": 4
     },

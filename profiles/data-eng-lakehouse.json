@@ -1,14 +1,13 @@
 {
   "profileId": "data-eng-lakehouse",
-  "description": "Perfil especializado en arquitecturas Medallion Lakehouse con Dagster, DuckDB/DuckLake, dbt, Parquet, PySpark/Delta/Iceberg, Kafka/Debezium CDC y Great Expectations/OpenLineage.",
-  "agentCategories": ["core", "data-engineering"],
-  "skillCategories": [
-    "core",
-    "duckdb-lakehouse",
-    "dagster-orchestration",
-    "dbt-transformation",
-    "data-modeling"
+  "description": "Lakehouse completo sobre Dagster y DuckDB: añade dbt, PySpark/Delta/Iceberg, Kafka/Debezium CDC e interoperabilidad con Airflow.",
+  "extends": ["data-eng-dagster-duckdb"],
+  "skillCategories": ["dbt-transformation"],
+  "skills": [
+    "pyspark-delta-iceberg-lakehouse",
+    "kafka-debezium-cdc-streaming",
+    "airflow-dagster-interoperability",
+    "ai-pipeline-incident-triage"
   ],
-  "ruleCategories": ["core", "data-engineering"],
-  "mcpTemplates": ["dbt", "dagster", "duckdb", "postgres", "docker"]
+  "mcpTemplates": ["dbt", "postgres"]
 }

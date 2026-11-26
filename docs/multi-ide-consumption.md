@@ -1,68 +1,66 @@
-# Guía de Consumo e Integración Multi-IDE (`universal-ide-agents`)
+# Consumo multi-IDE de `universal-ide-agents`
 
-Este documento unifica las instrucciones para consumir y sincronizar los activos de **Ingeniería de Datos** de `universal-ide-agents` en **Google Antigravity / Gemini CLI**, **Claude Code** y **VS Code / GitHub Copilot**.
+Cómo llega la capa genérica a un proyecto y qué carga cada IDE. El contrato con la plantilla `template-data-flow-automation` (manifiesto, verificador, guardián y cierre de tarea) está en [contrato-template-dfa.md](./contrato-template-dfa.md).
 
----
+## 1. Qué se despliega y dónde
 
-## 1. Matriz de Mapeo de Rutas por IDE
+`scripts/deploy-to-project.sh` (envoltorio de `scripts/deploy.py`) compila desde `core/` solo lo que piden los perfiles y lo escribe bajo tres raíces. Nunca toca `AGENTS.md`, `CLAUDE.md` ni `GEMINI.md`, ni crea `plans/`.
 
-El script de despliegue [deploy-to-project.sh](./scripts/deploy-to-project.sh) distribuye los activos compilados desde `core/` hacia el proyecto destino según el `--target` elegido (`all`, `antigravity`, `claude` o `vscode`):
+| IDE (`--target`) | Origen en `core/` | Destino en el proyecto |
+| :--- | :--- | :--- |
+| Antigravity (`antigravity`) | `agents/`, `skills/`, `rules/` | `.agents/agents/<n>.md`, `.agents/skills/<n>/`, `.agents/rules/<n>.md` |
+| Antigravity | `mcp/templates/` (filtrado por perfil) | `.agents/mcp_config.example.json` |
+| Claude Code (`claude`) | `agents/`, `skills/`, `rules/` | `.claude/agents/<n>.md`, `.claude/skills/<n>/`, `.claude/rules/<n>.md` |
+| Claude Code | `hooks/universal-ide-agents-guard.py` | `.claude/hooks/universal-ide-agents-guard.py` |
+| Claude Code | `mcp/templates/` (filtrado por perfil) | `.claude/mcp.example.json` |
+| Copilot (`vscode`) | `agents/`, `skills/`, `rules/` | `.github/agents/<n>.agent.md`, `.github/skills/<n>/`, `.github/instructions/<n>.instructions.md` |
+| Todos | — | `.agents/universal-ide-agents.json` (manifiesto) |
 
-| Ecosistema IDE | Origen en `universal-ide-agents` | Destino en el Proyecto Consumidor | Propósito |
-| :--- | :--- | :--- | :--- |
-| **Transversal (Todos)** | `AGENTS.md` | `AGENTS.md` | Constitución raíz multi-agente e índice de *Progressive Disclosure*. |
-| **Transversal (Todos)** | `plans/README.md` | `plans/README.md` + `plans/{knowledge,walkthroughs,historyPlans}` | Inicialización segura del Control Room sin sobrescribir `plans/registry.md`. |
-| **Antigravity / Gemini CLI** | `.agents/{agents,skills,rules}/` | `.agents/{agents,skills,rules}/` | Auto-discovery nativo de agentes, 25 skills (`<= 12,000` chars) y reglas en Antigravity. |
-| **Antigravity / Gemini CLI** | `.antigravity-instructions.md` | `.antigravity-instructions.md` | Directrices base de Antigravity en raíz. |
-| **Claude Code** | `.claude/{agents,skills,rules}/` | `.claude/{agents,skills,rules}/` | Subagentes, skills y reglas modulares para Claude Code. |
-| **Claude Code** | `CLAUDE.md` | `CLAUDE.md` | Punto de entrada automático para Claude Code CLI. |
-| **VS Code / GitHub Copilot** | `.github/{agents,skills,instructions,hooks}/` | `.github/{agents,skills,instructions,hooks}/` | Custom agents (`.agent.md`), skills (`SKILL.md`), instrucciones por glob y hooks de sesión. |
-| **VS Code / GitHub Copilot** | `.github/copilot-instructions.md` | `.github/copilot-instructions.md` | Instrucciones globales de repositorio para GitHub Copilot. |
+Ya no se despliegan `AGENTS.md`, `CLAUDE.md`, `.antigravity-instructions.md` (Antigravity no lo lee), `.github/copilot-instructions.md`, `.github/hooks/`, `docs/` ni `scripts/`.
 
----
+## 2. Perfiles
 
-## 2. Flujo de Integración Recomendado
+| Perfil | Extiende | Añade |
+| :--- | :--- | :--- |
+| `core` | — | Agentes y skills del núcleo, reglas `diagramming-svg`, `evidence-verification` y `limites-tres-niveles`; MCP `context7`. |
+| `data-eng-base` | `core` | Agentes de ingeniería de datos, skills de MongoDB y de modelado, reglas de MongoDB y de entornos Python; MCP `mongodb`. |
+| `data-eng-n8n` | `data-eng-base` | `n8n-workflow-engineering`. |
+| `data-eng-dagster-duckdb` | `data-eng-base` | Dagster, guardas Medallion, DuckDB/DuckLake, offload MongoDB a DuckDB; regla de DuckDB/Dagster/dbt; MCP `dagster` y `duckdb`. |
+| `data-eng-lakehouse` | `data-eng-dagster-duckdb` | dbt, PySpark/Delta/Iceberg, Kafka/Debezium, Airflow, triaje de incidentes; MCP `dbt` y `postgres`. |
+| `data-eng-full` | `data-eng-n8n`, `data-eng-lakehouse` | Docker, ML, procesamiento paralelo y todas las reglas. Para explorar, no para un proyecto real. |
 
-### Opción A — Despliegue Directo desde tu Hub Central Local
+Los perfiles se combinan: `--profile data-eng-n8n,data-eng-dagster-duckdb`. La categoría `hub` (`knowledge-harvester` como skill, `skill-creator`, `planning-and-versioning`) es de este repositorio y ningún perfil la despliega.
+
+## 3. Flujo en un proyecto
+
 ```bash
-# 1. Previsualizar qué se copiará (--dry-run)
-/ruta/a/universal-ide-agents/scripts/deploy-to-project.sh --dry-run --target all --profile data-eng-full "$PWD"
+# Una vez: el submódulo por HTTPS (no hace falta llave SSH)
+git submodule add https://github.com/Sebastian93BC/universal-ide-agents.git .modules/universal-ide-agents
 
-# 2. Desplegar hacia todos los IDEs (o filtrar con --target antigravity|claude|vscode)
-/ruta/a/universal-ide-agents/scripts/deploy-to-project.sh --target all --profile data-eng-full "$PWD"
+# Previsualizar, desplegar y verificar
+.modules/universal-ide-agents/scripts/deploy-to-project.sh --dry-run --profile data-eng-n8n .
+.modules/universal-ide-agents/scripts/deploy-to-project.sh --profile data-eng-n8n .
+python3 .modules/universal-ide-agents/scripts/check.py --project .
 
-# 3. Sincronizar eliminando activos obsoletos (--clean)
-/ruta/a/universal-ide-agents/scripts/deploy-to-project.sh --clean --target all --profile data-eng-full "$PWD"
+# Actualizar
+git submodule update --remote .modules/universal-ide-agents
+.modules/universal-ide-agents/scripts/deploy-to-project.sh --profile data-eng-n8n .
 ```
 
-### Opción B — Integración vía Submódulo Git (`.githubconfig/universal-ide-agents`)
-```bash
-# Configuración inicial en el proyecto consumidor
-git submodule add git@github.com:Sebastian93BC/universal-ide-agents.git .githubconfig/universal-ide-agents
-./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh "$PWD"
+## 4. Qué carga cada IDE
 
-# Actualización periódica del submódulo
-git submodule update --remote --merge
-./.githubconfig/universal-ide-agents/scripts/deploy-to-project.sh --clean "$PWD"
-```
+**Antigravity**, según su documentación, leída el 2026-11-25 ([customization discovery](https://antigravity.google/docs/customization-discovery/), [rules](https://antigravity.google/docs/rules.md), [skills](https://antigravity.google/docs/skills.md)):
 
----
+- Lee `AGENTS.md`, `GEMINI.md` y la carpeta `.agents/` de la carpeta de trabajo y de cada carpeta superior hasta la raíz del repositorio. `.agent/` sigue funcionando por compatibilidad, pero la recomendada es `.agents/`.
+- `AGENTS.md` y `GEMINI.md` no llevan frontmatter y están siempre activos. En ellos, `@archivo` se reescribe como referencia a una ruta y no inserta el contenido; `@[etiqueta](ruta)` sí lo inserta. Por eso un `GEMINI.md` con `@AGENTS.md` no duplica nada.
+- `.agents/rules/*.md` se lee a un solo nivel. Cada regla necesita frontmatter con `trigger` (`always_on`, `model_decision`, `glob` o `manual`); si falta o no es válido, **la descarta en silencio**. `validate_and_build.py` lo comprueba. El límite es de 24.000 bytes por regla y de 20.000 tokens entre todas las reglas activas. Este repositorio se impone 12.000 caracteres.
+- `.agents/skills/<carpeta>/SKILL.md`, a un nivel; `description` es obligatoria y `name` toma por defecto el nombre de la carpeta. Agentes propios en `.agents/agents/<n>.md`. MCP en `.agents/mcp_config.json`.
+- No lee `.antigravity-instructions.md`, que por eso se eliminó.
 
-## 3. Flujo de Trabajo Unificado entre IDEs (Planning -> Execution -> Review)
+**Claude Code**, comprobado en una sesión real el 2026-11-25: `CLAUDE.md` importa `AGENTS.md` con `@AGENTS.md`, y carga `.claude/rules/*.md`, `.claude/skills/` y `.claude/agents/`. Los hooks se declaran en `.claude/settings.json` (ver el contrato, sección 5).
 
-| Etapa | Rol / Agente Activo | Artefacto de Entrada / Salida | Regla de Gobernanza |
-| :--- | :--- | :--- | :--- |
-| **1. Investigación Previa** | `planner` / `data-engineer` / `data-modeling-architect` | Lectura de `plans/registry.md` y `plans/knowledge/` | Modo **100% solo lectura** para explorar esquemas, índices y contratos sin contaminar el contexto. |
-| **2. Planificación** | `planner` (o Planning Mode en Antigravity) | `plans/YYYY-MM-DD-tarea_plan.md` | Registrar en `plans/registry.md` (`En Progreso`), usar secciones `## ` (Parser V5) y **cero diagramas Mermaid** (solo SVG o tablas Markdown). |
-| **3. Implementación / TDD** | `implementer` / `tdd-cycle` | Código productivo + pruebas (`pytest`, `dbt unit_tests`, `GX`) | Todo script que mute datos debe incluir `--dry-run`, escritura atómica `.tmp` y los **5 Medallion Safety Guards**. |
-| **4. Revisión Forense** | `pipeline-reviewer` / `code-reviewer` / `data-security-auditor` | Reporte clasificado por severidad y evidencia | Etiquetar cada hallazgo como `[VERIFICADO]` o `[INFERIDO]` bajo `DEFECTO` \| `CONDICIONAL` \| `ENDURECIMIENTO` \| `PROPUESTA`. |
-| **5. Cierre y Cosecha** | `docs-steward` / `knowledge-harvester` | `plans/walkthroughs/*_walkthrough.md` + `CHANGELOG.md` | Archivar plan en `plans/historyPlans/` y ejecutar `python3 scripts/harvest.py` periódicamente para promover nuevos aprendizajes a `core/`. |
+**Copilot (VS Code)**, sin comprobar en esta revisión (`[INFERIDO]`): `AGENTS.md`, `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md` según `applyTo`, `.github/agents/` y `.github/skills/`.
 
----
+## 5. Servidores MCP
 
-## 4. Activación de Servidores MCP por IDE
-
-Copia la plantilla [data-eng-full.mcp.json](./core/mcp/templates/data-eng-full.mcp.json) a la ruta correspondiente de tu IDE y exporta las variables de entorno en tu `.env` local (nunca hardcodees credenciales):
-- **Antigravity**: `.agents/mcp_config.json` o `~/.gemini/config/mcp_config.json`
-- **Claude Code**: `.mcp.json` en la raíz del proyecto
-- **VS Code**: `.vscode/mcp.json` (cambiando la clave raíz `"mcpServers"` por `"servers"`)
+Copia el ejemplo filtrado a la ruta del IDE y define las variables de entorno sin escribir credenciales en el archivo: Antigravity en `.agents/mcp_config.json`, Claude Code en `.mcp.json` en la raíz, y VS Code en `.vscode/mcp.json`, cambiando la clave `"mcpServers"` por `"servers"`. El catálogo está en [core/mcp/catalog.md](../core/mcp/catalog.md).
