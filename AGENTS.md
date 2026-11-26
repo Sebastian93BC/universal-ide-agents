@@ -28,7 +28,7 @@ Fuente única de agentes, skills, reglas, hook y plantillas MCP de ingeniería d
 
 1. **Se edita `core/`, nunca el compilado.** Después: `python3 scripts/validate_and_build.py` y `make check`. Razón: el compilado se regenera y se pierde lo editado a mano.
 2. **El despliegue escribe solo en `.agents/`, `.claude/` y `.github/`.** Nunca toca `AGENTS.md`, `CLAUDE.md` ni `GEMINI.md` del proyecto: son de la plantilla y del cliente. Lo comprueban `deploy.py` y `check.py --project`.
-3. **Nada de clientes en lo que se publica.** El repositorio es público. Nombres de cliente, correos, URL de tenant, GUID, tokens y rutas `/Users/...` los bloquea `scan_sensitive.py`; los términos están en `harvester/schema/sanitization_rules.json`.
+3. **Nada de clientes en lo que se publica.** El repositorio es público. Nombres de cliente, correos, URL de tenant, GUID, tokens y rutas `/Users/...` los bloquea `scan_sensitive.py`. Los nombres de cliente van en `harvester/sanitization.local.json` (ignorado por git), nunca en la lista pública `harvester/schema/sanitization_rules.json`, que los publicaría.
 4. **Sin Mermaid.** Diagramas en SVG (`docs/img/`) o tablas Markdown. Razón: el visor de Antigravity no los renderiza.
 5. **Evidencia antes de afirmar.** Cada hallazgo lleva `[VERIFICADO]` o `[INFERIDO]` y una clase: `DEFECTO`, `CONDICIONAL`, `ENDURECIMIENTO` o `PROPUESTA`.
 6. **Cada regla en `core/rules/` lleva un `trigger` válido** (`always_on`, `model_decision`, `glob`, `manual`). Razón: Antigravity descarta en silencio la que no lo tiene.

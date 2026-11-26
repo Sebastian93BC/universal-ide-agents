@@ -5,18 +5,7 @@
     "antigravityMaxSkillChars": 12000,
     "rootInstructionMaxLines": 180
   },
-  "forbiddenClientTerms": [
-    "[cliente]",
-    "[cliente]",
-    "[cliente]",
-    "[cliente]",
-    "[cliente]",
-    "[cliente]",
-    "[cliente]",
-    "[cliente]",
-    "[cliente]",
-    "[cliente]"
-  ],
+  "forbiddenClientTerms": [],
   "forbiddenSecretPatterns": [
     "mongodb(\\+srv)?://[^\\s\"'`]+:[^\\s\"'`]+@",
     "postgres(ql)?://[^\\s\"'`]+:[^\\s\"'`]+@",
@@ -69,5 +58,6 @@
       "trustScore": 0.6,
       "description": "Nota inferida de sesión; requiere corroboración antes de convertirse en regla always_on."
     }
-  ]
+  ],
+  "forbiddenClientTermsNote": "Vacía a propósito: el repositorio es público y esta lista publicaría los nombres. Cada mantenedor pone los suyos en harvester/sanitization.local.json (ignorado por git)."
 }

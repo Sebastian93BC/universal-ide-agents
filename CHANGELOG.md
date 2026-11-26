@@ -18,6 +18,8 @@ Usable by people other than its maintainer.
 - **README rewritten**: what it is, how to install it in a project (submodule, profile, dry run, deploy, verify, guard, update, remove), how the repository is organized (`core/` vs. the generated `.agents/`, `.claude/`, `.github/`), how to work on it and how to configure the harvester. The technology overview and badges were removed.
 - **Harvester configurable by anyone** (`scripts/harvest.py`): configuration from `--config`, `UIA_HARVEST_CONFIG` or `harvester/sources.local.json`; without one it stops and explains instead of scanning the example paths. New `--init` and `--check-config` (shows roots and candidate counts, writes nothing). `includePatterns` (alias of the old, previously ignored `targetPatterns`) now selects files, at any depth and per root; missing roots are reported; the repository never harvests itself. The example configuration is generic.
 - **Local client terms**: `harvester/sanitization.local.json` (ignored) adds to the public `forbiddenClientTerms`; the validator, the scanner and the harvester use both. Client terms now match inside snake_case names.
+- **The public client-term list is now empty**: it published the very names it protects. Maintainers keep theirs in `harvester/sanitization.local.json`; CI still blocks emails, tenant URLs, tokens, credentials and personal paths.
+- **History rewritten** to remove `plans/`, the client-term list, personal paths and client paths from every commit; commit ids from before this release changed.
 
 ---
 
