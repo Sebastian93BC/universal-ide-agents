@@ -14,13 +14,51 @@ El `AGENTS.md` del proyecto tiene la capa de la plantilla y la del cliente; la p
 
 ## 2. Inclusión
 
-Como submódulo por HTTPS, sin llave SSH. El repositorio es público y el clon anónimo funciona (comprobado el 2026-11-25):
+La URL del submódulo es HTTPS. El repositorio es público y el clon anónimo funciona (comprobado el 2026-11-25), así que no hace falta llave:
 
 ```bash
 git submodule add https://github.com/Sebastian93BC/universal-ide-agents.git .modules/universal-ide-agents
 ```
 
 Para actualizar: `git submodule update --remote .modules/universal-ide-agents` y volver a desplegar.
+
+### 2.1 Quien prefiere SSH
+
+La URL en `.gitmodules` se queda en HTTPS, para que el proyecto no dependa de la forma de autenticarse de cada máquina. Cada máquina que clone o actualice el submódulo puede pedir a git que use SSH para GitHub:
+
+```bash
+git config --global url."git@github.com:".insteadOf "https://github.com/"
+```
+
+Esto reescribe todas las URL de GitHub por SSH en esa máquina. Si prefieres limitarlo a una organización, usa el patrón completo:
+
+```bash
+git config --global url."git@github.com:Sebastian93BC/".insteadOf "https://github.com/Sebastian93BC/"
+```
+
+### 2.2 Repositorios privados: deploy keys de solo lectura
+
+Si el submódulo o el proyecto que lo contiene es privado, no uses la llave personal del usuario. Usa una **deploy key**, que GitHub asocia a un solo repositorio:
+
+1. Genera una llave dedicada para ese repositorio, sin frase de paso si la va a usar un proceso automático: `ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_deploy_<repo> -C "deploy <repo>"`.
+2. En el repositorio, **Settings → Deploy keys → Add deploy key**, pega la parte `.pub`. Deja **sin marcar** *Allow write access*: la llave solo lee.
+3. Como una llave no sirve para varios repositorios, asigna un alias en `~/.ssh/config` para que git use esa llave y no la predeterminada:
+
+```text
+Host github.com-<repo>
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_deploy_<repo>
+    IdentitiesOnly yes
+```
+
+4. Reescribe la URL solo para ese repositorio:
+
+```bash
+git config --global url."git@github.com-<repo>:Sebastian93BC/<repo>.git".insteadOf "https://github.com/Sebastian93BC/<repo>.git"
+```
+
+Con esto, la URL del submódulo sigue en HTTPS y git la traduce a SSH con la llave de solo lectura. Así un proceso automático nunca tiene la llave personal del usuario.
 
 ## 3. Despliegue
 
@@ -49,7 +87,7 @@ Para actualizar: `git submodule update --remote .modules/universal-ide-agents` y
   "targets": ["antigravity", "claude", "vscode"],
   "deployedAt": "2026-11-25",
   "rootFiles": {"AGENTS.md": "sha256:…", "CLAUDE.md": "sha256:…", "GEMINI.md": "sha256:…"},
-  "files": {".claude/rules/limites-tres-niveles.md": "sha256:…"}
+  "files": {".claude/rules/three-level-limits.md": "sha256:…"}
 }
 ```
 
@@ -61,13 +99,13 @@ Para actualizar: `git submodule update --remote .modules/universal-ide-agents` y
 python3 .modules/universal-ide-agents/scripts/check.py --project .
 ```
 
-Comprueba que el manifiesto existe y está completo, que `AGENTS.md`, `CLAUDE.md` y `GEMINI.md` no cambiaron desde el despliegue, que cada archivo desplegado está y no se editó (si se editó, avisa), que `CLAUDE.md` y `GEMINI.md` son punteros de una línea, el tope de líneas de `AGENTS.md`, que cada skill tiene su `name` igual a su carpeta y que no hay copias de conflicto (`SKILL 2.md`). Sale con 1 si algo falla.
+Comprueba que el manifiesto existe y está completo, que cada archivo desplegado está y no se editó (si se editó, avisa), que `CLAUDE.md` y `GEMINI.md` son punteros de una línea, el tope de líneas de `AGENTS.md`, que cada skill tiene su `name` igual a su carpeta y que no hay copias de conflicto (`SKILL 2.md`). Sale con 1 si algo falla.
 
-Si el cliente edita su capa en `AGENTS.md`, el verificador lo señala hasta el siguiente despliegue, que registra la huella nueva.
+Los cambios en `AGENTS.md`, `CLAUDE.md` o `GEMINI.md` desde el último despliegue **no son un fallo**: la plantilla los actualiza con `copier update` y el cliente edita su capa. El verificador lo muestra como aviso informativo. Solo el propio despliegue debe no tocar esos archivos, y eso lo garantiza con su código de salida 3, no el verificador.
 
 ## 5. El guardián de límites
 
-La regla `limites-tres-niveles` tiene siete límites y cada uno se comprueba en `.claude/hooks/universal-ide-agents-guard.py`. El despliegue deja el script, pero conectarlo es cosa de `.claude/settings.json`, que es de la plantilla:
+La regla `three-level-limits` tiene siete límites y cada uno se comprueba en `.claude/hooks/universal-ide-agents-guard.py`. El despliegue deja el script, pero conectarlo es cosa de `.claude/settings.json`, que es de la plantilla:
 
 ```json
 {
@@ -123,7 +161,9 @@ La skill `session-handoff` deja al final de la sesión, en el archivo de estado 
 
 1. Incluir el submódulo por HTTPS en `.modules/universal-ide-agents` (sección 2).
 2. Conectar el guardián en su `.claude/settings.json` (sección 5).
+   - Si el equipo o un proceso automático clona por SSH, aplicar la sección 2.1 o 2.2 en esa máquina.
 3. En `dfa task close`, invocar `knowledge-harvester cierre-tarea` con las tres rutas y leer el bloque de respuesta (sección 6).
 4. En `dfa doctor`, llamar a `check.py --project` (sección 4).
 5. Designar en su capa de `AGENTS.md` el archivo de estado de la tarea para la nota de traspaso (sección 7).
-6. Su capa de `AGENTS.md` repite hoy los límites. Que digan lo mismo que la regla `limites-tres-niveles`; si una cambia, cambiar la otra.
+7. Si genera `docs/standards/mongodb-query-optimization.md`, la skill `mongodb-query-optimizer` ya le remite a ese documento (sección 0). Confirmar que el estándar y la skill no se contradicen antes de publicarlo; hoy el estándar no existe en ningún repositorio.
+6. Su capa de `AGENTS.md` repite hoy los límites. Que digan lo mismo que la regla `three-level-limits`; si una cambia, cambiar la otra.

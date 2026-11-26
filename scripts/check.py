@@ -234,15 +234,16 @@ def run_project(report: Report, project: Path) -> None:
   if not manifest or problems:
     return
 
+  # Informativo: estos archivos cambian legítimamente (la plantilla los actualiza con
+  # copier update y el cliente edita su capa). Solo el propio despliegue debe no tocarlos,
+  # y eso lo comprueba deploy.py con su código de salida 3.
   root_now = uia_lib.root_file_hashes(project)
-  problems = [
-      f"{name} cambió desde el despliegue del {manifest['deployedAt']}"
+  notes = [
+      f"{name} cambió desde el despliegue del {manifest['deployedAt']} (no es un error: lo actualizan la plantilla o el cliente)"
       for name, recorded in manifest["rootFiles"].items()
       if root_now.get(name) != recorded
   ]
-  if problems:
-    problems.append("si el cambio es tuyo (capa del cliente), vuelve a desplegar para registrar la nueva huella")
-  report.check("AGENTS.md, CLAUDE.md y GEMINI.md sin cambios", problems)
+  report.check("AGENTS.md, CLAUDE.md y GEMINI.md (informativo)", [], notes)
 
   missing, edited = [], []
   for rel, digest in manifest["files"].items():

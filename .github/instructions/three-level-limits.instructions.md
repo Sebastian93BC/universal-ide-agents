@@ -1,5 +1,5 @@
 ---
-name: limites-tres-niveles
+name: three-level-limits
 description: Límites del agente en tres niveles (siempre, preguntar primero, nunca). Una restricción y una razón por regla; cada una tiene una comprobación mecánica en el guardián de herramientas.
 trigger: always_on
 applyTo: "**"

@@ -1,13 +1,13 @@
 {
   "hooksVersion": "2.0.0",
-  "description": "Hooks de universal-ide-agents. El guardián se despliega en .claude/hooks/ y lo conecta el .claude/settings.json del proyecto (docs/contrato-template-dfa.md, sección 5).",
+  "description": "Hooks de universal-ide-agents. El guardián se despliega en .claude/hooks/ y lo conecta el .claude/settings.json del proyecto (docs/template-dfa-contract.md, sección 5).",
   "preToolUse": [
     {
-      "id": "limites-tres-niveles",
+      "id": "three-level-limits",
       "matcher": "Bash|Read|Grep|Glob|Edit|Write|MultiEdit|NotebookEdit",
       "script": "core/hooks/universal-ide-agents-guard.py",
       "deployedTo": ".claude/hooks/universal-ide-agents-guard.py",
-      "description": "Aplica la regla limites-tres-niveles: bloquea leer .env, imprimir secretos y borrar colecciones o tablas; pide confirmación para escribir en ambientes del cliente, desplegar, commit/push y editar fuera de la rama local."
+      "description": "Aplica la regla three-level-limits: bloquea leer .env, imprimir secretos y borrar colecciones o tablas; pide confirmación para escribir en ambientes del cliente, desplegar, commit/push y editar fuera de la rama local."
     }
   ],
   "repositoryChecks": [

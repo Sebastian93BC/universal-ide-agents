@@ -5,7 +5,7 @@ Agentes, skills y reglas de ingeniería de datos que se escriben una vez y se in
 ## Qué trae
 
 - **Agentes**, 11: un planificador, un implementador, revisores de código y de pipelines, un auditor de seguridad de datos, un especialista en TDD, uno de documentación, uno de triaje de incidentes, uno de modelado de datos, un ingeniero de datos y un curador de conocimiento que, al cerrar una tarea, pasa lo aprendido al conocimiento del proyecto.
-- **Skills**, 36: instrucciones que el agente carga solo cuando el tema aparece. Hay de MongoDB, modelado de datos, n8n, Dagster, DuckDB/Parquet, dbt, Spark, Kafka y Docker, además de la nota de traspaso entre sesiones.
+- **Skills**, 39: instrucciones que el agente carga solo cuando el tema aparece. Hay de MongoDB, modelado de datos, n8n, Dagster, DuckDB/Parquet, dbt, Spark, Kafka y Docker, además de la nota de traspaso entre sesiones.
 - **Reglas**, 7: se aplican siempre o según el tipo de archivo. Entre ellas, **los límites del agente**: trabajar en la rama `local`; preguntar antes de escribir en una base del cliente, desplegar o hacer commit; nunca leer credenciales ni borrar una colección. Un **guardián** para Claude Code las hace cumplir.
 - **Plantillas de servidores MCP** de solo lectura (MongoDB, DuckDB, Dagster, dbt, PostgreSQL), sin credenciales escritas.
 
@@ -51,7 +51,7 @@ python3 .modules/universal-ide-agents/scripts/check.py --project .
 
 Verifica la lista, que cada archivo instalado sigue igual y que `AGENTS.md`, `CLAUDE.md` y `GEMINI.md` no cambiaron.
 
-**5. Opcional: activa el guardián en Claude Code.** El archivo `.claude/hooks/universal-ide-agents-guard.py` ya está instalado; para activarlo, añade el bloque `hooks` de [docs/contrato-template-dfa.md](docs/contrato-template-dfa.md), sección 5, a tu `.claude/settings.json`. Para los servidores MCP, copia el ejemplo instalado (`.claude/mcp.example.json` o `.agents/mcp_config.example.json`) a la ruta de tu IDE y define las variables de entorno.
+**5. Opcional: activa el guardián en Claude Code.** El archivo `.claude/hooks/universal-ide-agents-guard.py` ya está instalado; para activarlo, añade el bloque `hooks` de [docs/template-dfa-contract.md](docs/template-dfa-contract.md), sección 5, a tu `.claude/settings.json`. Para los servidores MCP, copia el ejemplo instalado (`.claude/mcp.example.json` o `.agents/mcp_config.example.json`) a la ruta de tu IDE y define las variables de entorno.
 
 **Actualizar:** `git submodule update --remote .modules/universal-ide-agents` y repite el paso 3. Lo que ya no corresponde al perfil se borra; lo que editaste se conserva y se avisa.
 
@@ -69,7 +69,7 @@ Verifica la lista, que cada archivo instalado sigue igual y que `AGENTS.md`, `CL
 | `docs/` | Catálogo, guía por IDE y contrato de integración. | Sí. |
 | `plans/` | Registro local de tareas de quien mantiene el repositorio. Git lo ignora y no se publica. | Local. |
 
-Por ejemplo, la regla `core/rules/core/limites-tres-niveles.rule.md` se copia como `.agents/rules/limites-tres-niveles.md`, `.claude/rules/limites-tres-niveles.md` y `.github/instructions/limites-tres-niveles.instructions.md`.
+Por ejemplo, la regla `core/rules/core/three-level-limits.rule.md` se copia como `.agents/rules/three-level-limits.md`, `.claude/rules/three-level-limits.md` y `.github/instructions/three-level-limits.instructions.md`.
 
 ## Trabajar en este repositorio
 
@@ -78,6 +78,8 @@ Por ejemplo, la regla `core/rules/core/limites-tres-niveles.rule.md` se copia co
 3. Verifica: `make check`. `make` es una herramienta que ya trae macOS y el `Makefile` solo guarda atajos. `make check` comprueba lo mecánico (formato, copias al día, enlaces, que no haya nombres de cliente, correos, tokens ni rutas personales) y corre las pruebas. Lo mismo se ejecuta en cada pull request.
 
 Las instrucciones para los agentes que trabajan aquí están en [AGENTS.md](AGENTS.md).
+
+Para instalar y mantener la capa en un proyecto, ver [docs/usage-guide.md](docs/usage-guide.md).
 
 ## Cosechar conocimiento de tus carpetas (harvester)
 
@@ -104,9 +106,10 @@ Los nombres de tus clientes van en `harvester/sanitization.local.json` (`{"forbi
 
 | Documento | Cuándo leerlo |
 | :--- | :--- |
+| [docs/usage-guide.md](docs/usage-guide.md) | Para instalar, elegir perfil, desplegar, verificar, actualizar y quitar la capa en un proyecto. |
 | [docs/asset-catalog.md](docs/asset-catalog.md) | Para saber qué hace cada agente, skill y regla. |
 | [docs/multi-ide-consumption.md](docs/multi-ide-consumption.md) | Para saber qué archivo va a qué carpeta en cada IDE y qué carga cada uno. |
-| [docs/contrato-template-dfa.md](docs/contrato-template-dfa.md) | Si integras la instalación en una plantilla de proyectos: el manifiesto, la verificación, el guardián y el cierre de tarea. |
+| [docs/template-dfa-contract.md](docs/template-dfa-contract.md) | Si integras la instalación en una plantilla de proyectos: el manifiesto, la verificación, el guardián y el cierre de tarea. |
 | [core/mcp/catalog.md](core/mcp/catalog.md) | Para configurar los servidores MCP con seguridad. |
 | [core/playbooks/data-engineering-production-playbook.md](core/playbooks/data-engineering-production-playbook.md) | Para incidentes de producción ya resueltos: síntoma, causa y arreglo. |
 | [CHANGELOG.md](CHANGELOG.md) | Para ver qué cambió en cada versión. |

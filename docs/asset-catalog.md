@@ -18,11 +18,11 @@ Todos los activos de este catálogo tienen su fuente canónica en `core/` y son 
 | **Core Lifecycle** | `code-reviewer` | Revisión de código general y de datos con citas `archivo:línea` y taxonomía estricta de 4 niveles. | Lectura y Análisis (`read`, `search`) |
 | **Core Lifecycle** | `docs-steward` | Gobernanza documental, sincronización de catálogos, CHANGELOG y diagramación estricta en SVG / tablas (cero Mermaid). | Documentación (`read`, `search`, `edit`) |
 | **Core Lifecycle** | `tdd-cycle` | Ciclo disciplinado Red-Green-Refactor (`pytest`, `dbt unit_tests:`, `Great Expectations`). | Completo (`read`, `search`, `edit`, `execute`) |
-| **Core Lifecycle** | `knowledge-harvester` | Dos modos. **Cierre de tarea** (proyecto): consolida el conocimiento de la tarea en el del proyecto, con las tres rutas recibidas por argumento (contrato con `dfa`, [contrato-template-dfa.md](./contrato-template-dfa.md)). **Hub**: procesa los reportes de `scripts/harvest.py` y consolida en `core/` (`CREATE`/`UPDATE`/`INVALIDATE`). | Completo (`read`, `search`, `edit`, `execute`) |
+| **Core Lifecycle** | `knowledge-harvester` | Dos modos. **Cierre de tarea** (proyecto): consolida el conocimiento de la tarea en el del proyecto, con las tres rutas recibidas por argumento (contrato con `dfa`, [template-dfa-contract.md](./template-dfa-contract.md)). **Hub**: procesa los reportes de `scripts/harvest.py` y consolida en `core/` (`CREATE`/`UPDATE`/`INVALIDATE`). | Completo (`read`, `search`, `edit`, `execute`) |
 
 ---
 
-## 2. Catálogo de 36 Skills Modulares (`SKILL.md`)
+## 2. Catálogo de 39 Skills Modulares (`SKILL.md`)
 
 | Categoría | Skill (`core/skills/<cat>/<name>/SKILL.md`) | Tecnologías y Problemas que Resuelve |
 | :--- | :--- | :--- |
@@ -60,6 +60,9 @@ Todos los activos de este catálogo tienen su fuente canónica en `core/` y son 
 | **Automatización, Infra & Core** | `otel-pipeline-observability` | Jerarquía de 3 niveles de Spans OpenTelemetry (`Módulo -> Proceso -> Operación`), sanitización PII y paneles Sistema vs Calidad. |
 | **Automatización, Infra & Core** | `subagent-orchestration-patterns` | Los 5 patrones de orquestación multi-agente y aislamiento de contexto (*Context Engineering*). |
 | **Core** | `session-handoff` | Nota de traspaso al cerrar una sesión: dónde quedó, qué se decidió (incluido lo rechazado), siguiente paso y preguntas abiertas, escrita en la tarea para la siguiente sesión o el otro IDE. |
+| **Core** | `universal-ide-agents-usage` | Cómo instalar, desplegar, verificar, actualizar y quitar la capa cuando está como submódulo en el proyecto: perfiles, conflictos y qué no tocar. Se despliega con cualquier perfil. |
+| **Core** | `git-tags-and-releases` | Tags anotados, envío y borrado en el remoto, flujo de release, versionado semántico y reglas de CI por tag. |
+| **Core** | `gitlab-ssh-access` | Llave SSH dedicada para GitLab desde macOS, `~/.ssh/config`, verificación y errores frecuentes, sin exponer la llave privada. |
 | **Hub (solo este repositorio)** | `knowledge-harvester` | Operación del motor periódico `scripts/harvest.py` y consolidación ETL de memoria procedural (`CREATE`/`UPDATE`/`INVALIDATE`). |
 | **Hub (solo este repositorio)** | `skill-creator` | Estándar de creación de skills multi-IDE (`<= 12,000` chars, YAML frontmatter, progressive disclosure). |
 
@@ -67,8 +70,8 @@ Todos los activos de este catálogo tienen su fuente canónica en `core/` y son 
 
 ## 3. Reglas, Perfiles, Hook, MCP y Playbooks
 
-- **Reglas (`core/rules/`)**: núcleo `diagramming-svg`, `evidence-verification` y `limites-tres-niveles` (siete límites en tres niveles, cada uno con su comprobación en el guardián); ingeniería de datos `mongodb-bson-and-merge-invariants`, `duckdb-dagster-dbt-invariants` y `python-env-and-pipeline-safety`; hub `planning-and-versioning`.
-- **Hook (`core/hooks/`)**: `universal-ide-agents-guard.py`, guardián `PreToolUse` de Claude Code que aplica `limites-tres-niveles`. Se despliega en `.claude/hooks/` y lo conecta el `.claude/settings.json` del proyecto.
+- **Reglas (`core/rules/`)**: núcleo `diagramming-svg`, `evidence-verification` y `three-level-limits` (siete límites en tres niveles, cada uno con su comprobación en el guardián); ingeniería de datos `mongodb-bson-and-merge-invariants`, `duckdb-dagster-dbt-invariants` y `python-env-and-pipeline-safety`; hub `planning-and-versioning`.
+- **Hook (`core/hooks/`)**: `universal-ide-agents-guard.py`, guardián `PreToolUse` de Claude Code que aplica `three-level-limits`. Se despliega en `.claude/hooks/` y lo conecta el `.claude/settings.json` del proyecto.
 - **Perfiles de despliegue (`profiles/`)**: `core`, `data-eng-base` (núcleo, MongoDB y modelado, sin herramienta de ETL), `data-eng-n8n`, `data-eng-dagster-duckdb`, `data-eng-lakehouse` y `data-eng-full`. Detalle en [multi-ide-consumption.md](./multi-ide-consumption.md), sección 2.
 - **Catálogo y plantillas MCP**: [core/mcp/catalog.md](../core/mcp/catalog.md) y `core/mcp/templates/data-eng-full.mcp.json`, filtrada por perfil al desplegar.
 - **Playbook de producción**: [core/playbooks/data-engineering-production-playbook.md](../core/playbooks/data-engineering-production-playbook.md).

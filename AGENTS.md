@@ -42,4 +42,4 @@ Fuente única de agentes, skills, reglas, hook y plantillas MCP de ingeniería d
 - **Antigravity** (comprobado el 2026-11-25 en su documentación): `AGENTS.md` y `GEMINI.md` (siempre activos, sin frontmatter), `.agents/rules/*.md` (un nivel, con `trigger`), `.agents/skills/<name>/SKILL.md`, `.agents/agents/` y `.agents/mcp_config.json`. En `GEMINI.md`, `@AGENTS.md` es una referencia y no duplica el contenido.
 - **Copilot (VS Code)** (sin comprobar en esta revisión, `[INFERIDO]`): `AGENTS.md`, `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md` (según `applyTo`), `.github/agents/` y `.github/skills/`.
 
-Detalle y fuentes: [docs/multi-ide-consumption.md](docs/multi-ide-consumption.md). Catálogo: [docs/asset-catalog.md](docs/asset-catalog.md). Contrato con la plantilla: [docs/contrato-template-dfa.md](docs/contrato-template-dfa.md).
+Detalle y fuentes: [docs/multi-ide-consumption.md](docs/multi-ide-consumption.md). Catálogo: [docs/asset-catalog.md](docs/asset-catalog.md). Contrato con la plantilla: [docs/template-dfa-contract.md](docs/template-dfa-contract.md).

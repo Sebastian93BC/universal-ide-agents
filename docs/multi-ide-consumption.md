@@ -1,6 +1,6 @@
 # Consumo multi-IDE de `universal-ide-agents`
 
-Cómo llega la capa genérica a un proyecto y qué carga cada IDE. El contrato con la plantilla `template-data-flow-automation` (manifiesto, verificador, guardián y cierre de tarea) está en [contrato-template-dfa.md](./contrato-template-dfa.md).
+Cómo llega la capa genérica a un proyecto y qué carga cada IDE. El contrato con la plantilla `template-data-flow-automation` (manifiesto, verificador, guardián y cierre de tarea) está en [template-dfa-contract.md](./template-dfa-contract.md).
 
 ## 1. Qué se despliega y dónde
 
@@ -22,7 +22,7 @@ Ya no se despliegan `AGENTS.md`, `CLAUDE.md`, `.antigravity-instructions.md` (An
 
 | Perfil | Extiende | Añade |
 | :--- | :--- | :--- |
-| `core` | — | Agentes y skills del núcleo, reglas `diagramming-svg`, `evidence-verification` y `limites-tres-niveles`; MCP `context7`. |
+| `core` | — | Agentes y skills del núcleo, reglas `diagramming-svg`, `evidence-verification` y `three-level-limits`; MCP `context7`. |
 | `data-eng-base` | `core` | Agentes de ingeniería de datos, skills de MongoDB y de modelado, reglas de MongoDB y de entornos Python; MCP `mongodb`. |
 | `data-eng-n8n` | `data-eng-base` | `n8n-workflow-engineering`. |
 | `data-eng-dagster-duckdb` | `data-eng-base` | Dagster, guardas Medallion, DuckDB/DuckLake, offload MongoDB a DuckDB; regla de DuckDB/Dagster/dbt; MCP `dagster` y `duckdb`. |

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Guardián de límites en tres niveles para Claude Code (hook PreToolUse).
 
-Aplica las comprobaciones de la regla `limites-tres-niveles`:
+Aplica las comprobaciones de la regla `three-level-limits`:
 
 - Nunca (deny): leer `.env`/`.env.*` (salvo `.env.example`), imprimir secretos,
   borrar colecciones o tablas.

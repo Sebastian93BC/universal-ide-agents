@@ -71,7 +71,7 @@ class DeployTest(unittest.TestCase):
     for hub in ("knowledge-harvester", "skill-creator"):
       self.assertNotIn(hub, skills)
     rules = {p.stem for p in (self.project / ".claude/rules").iterdir()}
-    self.assertIn("limites-tres-niveles", rules)
+    self.assertIn("three-level-limits", rules)
     self.assertNotIn("duckdb-dagster-dbt-invariants", rules)
     self.assertNotIn("planning-and-versioning", rules)
     mcp = json.loads((self.project / ".claude/mcp.example.json").read_text())["mcpServers"]
@@ -104,7 +104,7 @@ class DeployTest(unittest.TestCase):
 
   def test_archivo_desplegado_editado_es_conflicto(self):
     self.deploy("--profile", "data-eng-n8n")
-    edited = self.project / ".claude/rules/limites-tres-niveles.md"
+    edited = self.project / ".claude/rules/three-level-limits.md"
     edited.write_text("editado\n")
     code, out = self.deploy("--profile", "data-eng-n8n")
     self.assertEqual(code, 2, out)
@@ -118,7 +118,7 @@ class DeployTest(unittest.TestCase):
 
   def test_target_solo_claude(self):
     self.deploy("--target", "claude", "--profile", "core")
-    self.assertTrue((self.project / ".claude/rules/limites-tres-niveles.md").is_file())
+    self.assertTrue((self.project / ".claude/rules/three-level-limits.md").is_file())
     self.assertFalse((self.project / ".agents/skills").exists())
     self.assertFalse((self.project / ".github").exists())
     self.assertTrue((self.project / ".agents/universal-ide-agents.json").is_file())
@@ -133,8 +133,9 @@ class DeployTest(unittest.TestCase):
     self.assertEqual(code, 0, out)
     (self.project / "AGENTS.md").write_text(ROOT_FILES["AGENTS.md"] + "- cambio\n")
     code, out = quiet(check.main, ["--project", str(self.project)])
-    self.assertEqual(code, 1, out)
+    self.assertEqual(code, 0, out)  # un cambio en la raíz es aviso, no fallo
     self.assertIn("AGENTS.md cambió", out)
+    self.assertIn("[AVISO]", out)
 
   def test_verificador_sin_manifiesto_falla(self):
     code, out = quiet(check.main, ["--project", str(self.project)])

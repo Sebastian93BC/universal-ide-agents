@@ -25,7 +25,9 @@
       "plans/"
     ],
     "allowedEmails": [
-      "noreply@anthropic.com"
+      "noreply@anthropic.com",
+      "git@gitlab.com",
+      "git@github.com"
     ],
     "allowedEmailDomains": [
       "example.com",

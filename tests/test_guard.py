@@ -1,4 +1,4 @@
-"""U4: cada límite de la regla limites-tres-niveles tiene su comprobación."""
+"""U4: cada límite de la regla three-level-limits tiene su comprobación."""
 
 from __future__ import annotations
 
