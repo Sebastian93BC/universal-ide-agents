@@ -22,6 +22,9 @@ PROFILES_DIR = REPO_ROOT / "profiles"
 MCP_TEMPLATE = CORE_DIR / "mcp" / "templates" / "data-eng-full.mcp.json"
 GUARD_HOOK = CORE_DIR / "hooks" / "universal-ide-agents-guard.py"
 CHANGELOG = REPO_ROOT / "CHANGELOG.md"
+SANITIZATION_RULES = REPO_ROOT / "harvester" / "schema" / "sanitization_rules.json"
+# Términos propios de quien mantiene el repositorio (sus clientes); ignorado por git.
+SANITIZATION_LOCAL = REPO_ROOT / "harvester" / "sanitization.local.json"
 
 # Categorías que solo sirven dentro de este repositorio y nunca se despliegan.
 HUB_ONLY_CATEGORIES = {"hub"}
@@ -89,6 +92,27 @@ def source_version() -> str:
     if m:
       return m.group(1)
   return "0.0.0"
+
+
+def load_sanitization_rules() -> dict:
+  """Reglas de sanitización: las públicas más las locales (harvester/sanitization.local.json).
+
+  El archivo local solo aporta listas que se suman a las públicas
+  (`forbiddenClientTerms`, `forbiddenSecretPatterns`, `forbiddenPathPatterns`).
+  """
+  rules = json.loads(SANITIZATION_RULES.read_text(encoding="utf-8")) if SANITIZATION_RULES.exists() else {}
+  if SANITIZATION_LOCAL.exists():
+    local = json.loads(SANITIZATION_LOCAL.read_text(encoding="utf-8"))
+    for key in ("forbiddenClientTerms", "forbiddenSecretPatterns", "forbiddenPathPatterns"):
+      merged = list(rules.get(key, []))
+      merged += [v for v in local.get(key, []) if v not in merged]
+      rules[key] = merged
+  return rules
+
+
+def client_term_regexes(rules: dict) -> list[re.Pattern]:
+  """El guion bajo cuenta como separador: "proyectos_acme" contiene "acme"."""
+  return [re.compile(rf"(?<![A-Za-z0-9]){rx}(?![A-Za-z0-9])", re.IGNORECASE) for rx in rules.get("forbiddenClientTerms", [])]
 
 
 # --- Inventario --------------------------------------------------------------

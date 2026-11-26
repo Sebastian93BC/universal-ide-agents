@@ -1,11 +1,27 @@
 #!/usr/bin/env python3
-"""Motor Periódico Knowledge & Skill Harvester para universal-ide-agents.
+"""Knowledge Harvester: busca conocimiento nuevo para universal-ide-agents en tus carpetas.
 
-Escanea de forma incremental los directorios de proyectos, cursos y memorias configurados
-en `harvester/sources.local.json` (o `harvester/sources.example.json`), compara hashes SHA-256
-contra `harvester/state.local.json`, pre-evalúa términos sensibles de clientes y genera un
-informe de candidatos a generalizar en `harvester/inbox/<YYYY-MM-DD>/harvest_report.md`.
+Recorre las carpetas que configures (proyectos, cursos, memorias de los IDE),
+detecta por SHA-256 los archivos nuevos o cambiados desde la última cosecha,
+marca los que contienen términos de cliente y escribe un informe en
+`harvester/inbox/<AAAA-MM-DD>/harvest_report.md`. Después el agente
+`knowledge-harvester` (modo hub) generaliza lo útil y lo lleva a `core/`.
+
+Configuración (la primera que exista):
+  1. `--config RUTA`
+  2. la variable de entorno `UIA_HARVEST_CONFIG`
+  3. `harvester/sources.local.json` (ignorado por git)
+
+Uso:
+  python3 scripts/harvest.py --init            # crea harvester/sources.local.json desde el ejemplo
+  python3 scripts/harvest.py --check-config    # muestra qué leería, sin escribir nada
+  python3 scripts/harvest.py                   # cosecha y escribe el informe
+  python3 scripts/harvest.py --mark-processed  # además, guarda el estado para la próxima vez
+
+Solo biblioteca estándar. Nunca recorre el propio universal-ide-agents.
 """
+
+from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
@@ -14,243 +30,265 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import re
 import sys
 
+import uia_lib
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = uia_lib.REPO_ROOT
 HARVESTER_DIR = REPO_ROOT / "harvester"
 LOCAL_SOURCES = HARVESTER_DIR / "sources.local.json"
 EXAMPLE_SOURCES = HARVESTER_DIR / "sources.example.json"
 LOCAL_STATE = HARVESTER_DIR / "state.local.json"
-SANITIZATION_SCHEMA = HARVESTER_DIR / "schema" / "sanitization_rules.json"
+CONFIG_ENV = "UIA_HARVEST_CONFIG"
 
-INTERESTING_FILENAME_KEYWORDS = (
-    "skill",
-    "agent",
-    "claude",
-    "agents",
-    "gemini",
-    "memory",
-    "arquitectura",
-    "fallo",
-    "error",
-    "standard",
-    "rule",
-    "instruction",
-    "mcp",
-    "duck",
-    "dagster",
-    "dbt",
-    "mongo",
-)
+DEFAULT_EXTENSIONS = [".md", ".py", ".json", ".txt", ".docx"]
+DEFAULT_EXCLUDE_DIRS = ["node_modules", ".git", ".venv", "venv", "__pycache__", "dist", "build"]
+CATEGORIES = {"projects", "courses", "research", "agent-memory"}
 
 
-def load_json(path: Path, default: dict) -> dict:
+class ConfigError(ValueError):
+  pass
+
+
+# --- Configuración -----------------------------------------------------------
+
+def config_path(cli_value: str | None) -> Path:
+  if cli_value:
+    return Path(cli_value).expanduser()
+  if os.environ.get(CONFIG_ENV):
+    return Path(os.environ[CONFIG_ENV]).expanduser()
+  return LOCAL_SOURCES
+
+
+def load_config(path: Path) -> dict:
+  """Lee y valida la configuración. Falla con un mensaje que dice qué corregir."""
   if not path.exists():
-    return default
-  return json.loads(path.read_text(encoding="utf-8"))
+    raise ConfigError(
+        f"No hay configuración en {path}.\n"
+        f"  Créala con: python3 scripts/harvest.py --init\n"
+        f"  y edita 'watchRoots' con tus carpetas (o usa --config / {CONFIG_ENV})."
+    )
+  try:
+    cfg = json.loads(path.read_text(encoding="utf-8"))
+  except json.JSONDecodeError as exc:
+    raise ConfigError(f"{path} no es JSON válido: {exc}") from exc
+
+  roots = cfg.get("watchRoots")
+  if not isinstance(roots, list) or not roots:
+    raise ConfigError(f"{path}: 'watchRoots' debe ser una lista con al menos una carpeta.")
+  seen = set()
+  for i, root in enumerate(roots):
+    where = f"{path}: watchRoots[{i}]"
+    for key in ("id", "path"):
+      if not isinstance(root.get(key), str) or not root[key].strip():
+        raise ConfigError(f"{where} necesita '{key}'.")
+    if root["id"] in seen:
+      raise ConfigError(f"{where}: id '{root['id']}' repetido.")
+    seen.add(root["id"])
+    if root.get("category", "projects") not in CATEGORIES:
+      raise ConfigError(f"{where}: category debe ser una de {sorted(CATEGORIES)}.")
+  # `targetPatterns` es el nombre antiguo de `includePatterns`.
+  if "includePatterns" not in cfg and "targetPatterns" in cfg:
+    cfg["includePatterns"] = cfg["targetPatterns"]
+  return cfg
 
 
-def sha256_file(path: Path) -> str:
-  h = hashlib.sha256()
-  with path.open("rb") as f:
-    for chunk in iter(lambda: f.read(65536), b""):
-      h.update(chunk)
-  return h.hexdigest()
+def init_config() -> int:
+  if LOCAL_SOURCES.exists():
+    print(f"[info] {show(LOCAL_SOURCES)} ya existe; no se toca.")
+    return 0
+  LOCAL_SOURCES.write_text(EXAMPLE_SOURCES.read_text(encoding="utf-8"), encoding="utf-8")
+  print(f"[OK] Creado {show(LOCAL_SOURCES)} (ignorado por git).")
+  print("     Edita 'watchRoots' con tus carpetas y comprueba con: python3 scripts/harvest.py --check-config")
+  return 0
 
 
-def is_candidate_file(file_path: Path, rel_str: str) -> bool:
-  if file_path.suffix.lower() not in (".md", ".py", ".json", ".docx", ".txt"):
-    return False
-  parts_lower = [p.lower() for p in file_path.parts]
-  if any(
-      skip in parts_lower
-      for skip in ("node_modules", ".git", ".venv", "venv", "__pycache__", "dist", "build")
-  ):
-    return False
-  if any(dot in parts_lower for dot in (".agents", ".claude", ".github", "memory", "fallos")):
-    return True
-  name_lower = file_path.name.lower()
-  if name_lower in ("claude.md", "agents.md", "gemini.md", ".mcp.json", "mcp_config.json"):
-    return True
-  return any(kw in rel_str.lower() for kw in INTERESTING_FILENAME_KEYWORDS)
+# --- Selección de archivos -----------------------------------------------------
+
+def matches(rel: str, pattern: str) -> bool:
+  """Glob que vale a cualquier profundidad dentro de la carpeta vigilada.
+
+  Una carpeta vigilada suele contener varios proyectos (`~/Proyectos/a`, `~/Proyectos/b`),
+  así que `.claude/**/*.md` debe encontrar `a/.claude/skills/x/SKILL.md`. Se prueba el
+  patrón contra la ruta y contra cada sufijo que empieza en una carpeta. '**/' también
+  vale para cero carpetas.
+  """
+  pattern = pattern[3:] if pattern.startswith("**/") else pattern
+  parts = rel.split("/")
+  return any(fnmatch.fnmatchcase("/".join(parts[i:]), pattern) for i in range(len(parts)))
 
 
-def scan_watch_roots(sources_cfg: dict) -> dict[str, dict]:
+def show(path: Path) -> str:
+  try:
+    return str(path.relative_to(REPO_ROOT))
+  except ValueError:
+    return str(path)
+
+
+def iter_candidates(root: dict, cfg: dict):
+  """Rutas de los archivos que interesan dentro de una carpeta vigilada."""
+  base = Path(os.path.expanduser(root["path"]))
+  patterns = root.get("includePatterns") or cfg.get("includePatterns") or []
+  extensions = [e.lower() for e in (root.get("fileExtensions") or cfg.get("fileExtensions") or DEFAULT_EXTENSIONS)]
+  exclude = set(DEFAULT_EXCLUDE_DIRS) | set(cfg.get("excludeDirs", [])) | set(root.get("excludeDirs", []))
+  max_depth = int(root.get("maxDepth", 5))
+  repo = REPO_ROOT.resolve()
+  base_depth = len(base.parts)
+  for dirpath, dirnames, filenames in os.walk(base):
+    current = Path(dirpath)
+    if current.resolve() == repo:  # nunca se cosecha a sí mismo
+      dirnames[:] = []
+      continue
+    if len(current.parts) - base_depth >= max_depth:
+      dirnames[:] = []
+      continue
+    dirnames[:] = [d for d in dirnames if d not in exclude and not (current / d).resolve() == repo]
+    for fname in filenames:
+      fpath = current / fname
+      if fpath.suffix.lower() not in extensions:
+        continue
+      rel = fpath.relative_to(base).as_posix()
+      if patterns and not any(matches(rel, p) for p in patterns):
+        continue
+      yield fpath, rel
+
+
+def scan_watch_roots(cfg: dict, warn=print) -> dict[str, dict]:
   discovered: dict[str, dict] = {}
-  for root_entry in sources_cfg.get("watchRoots", []):
-    root_id = root_entry["id"]
-    category = root_entry.get("category", "projects")
-    max_depth = int(root_entry.get("maxDepth", 5))
-    exclude_dirs = set(root_entry.get("excludeDirs", []))
-    expanded_path = Path(os.path.expanduser(root_entry["path"]))
-
+  for root in cfg["watchRoots"]:
+    base = Path(os.path.expanduser(root["path"]))
     try:
-      if not expanded_path.exists():
+      if not base.is_dir():
+        warn(f"[aviso] '{root['id']}': {base} no existe o no es una carpeta; se omite.")
         continue
     except PermissionError:
-      print(
-          f"[WARN] Sin permiso de lectura para {expanded_path} (ejecuta fuera de sandbox para escanear esta ruta).",
-          file=sys.stderr,
-      )
+      warn(f"[aviso] '{root['id']}': sin permiso de lectura en {base}; se omite.")
       continue
-
-    base_depth = len(expanded_path.parts)
-    for dirpath, dirnames, filenames in os.walk(expanded_path):
-      current_path = Path(dirpath)
-      depth = len(current_path.parts) - base_depth
-      if depth >= max_depth:
-        dirnames[:] = []
+    for fpath, rel in iter_candidates(root, cfg):
+      try:
+        digest = hashlib.sha256(fpath.read_bytes()).hexdigest()
+        stat = fpath.stat()
+      except OSError:
         continue
-
-      dirnames[:] = [
-          d
-          for d in dirnames
-          if d not in exclude_dirs
-          and d not in ("node_modules", ".git", ".venv", "venv", "__pycache__")
-      ]
-
-      for fname in filenames:
-        fpath = current_path / fname
-        rel_str = str(fpath.relative_to(expanded_path))
-        if not is_candidate_file(fpath, rel_str):
-          continue
-        try:
-          digest = sha256_file(fpath)
-          stat = fpath.stat()
-        except OSError:
-          continue
-        discovered[str(fpath)] = {
-            "rootId": root_id,
-            "category": category,
-            "relativePath": rel_str,
-            "sha256": digest,
-            "sizeBytes": stat.st_size,
-            "mtime": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(),
-        }
+      discovered[str(fpath)] = {
+          "rootId": root["id"],
+          "category": root.get("category", "projects"),
+          "relativePath": rel,
+          "sha256": digest,
+          "sizeBytes": stat.st_size,
+          "mtime": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(),
+      }
   return discovered
 
 
-def check_client_terms(file_path: Path, client_regexes: list[re.Pattern]) -> list[str]:
-  if file_path.suffix.lower() not in (".md", ".py", ".json", ".txt"):
-    return []
+def client_terms_in(path: Path, regexes) -> list[str]:
   try:
-    text = file_path.read_text(encoding="utf-8", errors="ignore")
+    text = path.read_text(encoding="utf-8", errors="ignore")
   except OSError:
     return []
-  found = []
-  for rx in client_regexes:
-    m = rx.search(text)
-    if m:
-      found.append(m.group(0))
-  return sorted(set(found))
+  return sorted({m.group(0) for rx in regexes for m in [rx.search(text)] if m})
 
 
-def main() -> int:
-  parser = argparse.ArgumentParser(description=__doc__)
-  parser.add_argument(
-      "--mark-processed",
-      action="store_true",
-      help="Actualiza harvester/state.local.json marcando todos los archivos actuales como procesados.",
-  )
-  parser.add_argument(
-      "--init-local-config",
-      action="store_true",
-      help="Crea harvester/sources.local.json a partir de sources.example.json si no existe.",
-  )
-  args = parser.parse_args()
+# --- Órdenes ------------------------------------------------------------------
 
-  if args.init_local_config and not LOCAL_SOURCES.exists():
-    LOCAL_SOURCES.write_text(
-        EXAMPLE_SOURCES.read_text(encoding="utf-8"), encoding="utf-8"
-    )
-    print(f"[OK] Creado {LOCAL_SOURCES.relative_to(REPO_ROOT)}")
+def check_config(cfg: dict, path: Path) -> int:
+  rules = uia_lib.load_sanitization_rules()
+  print(f"Configuración: {path}")
+  print(f"Patrones globales: {', '.join(cfg.get('includePatterns') or []) or '(ninguno: toda extensión admitida)'}")
+  print(f"Términos de cliente a marcar: {len(rules.get('forbiddenClientTerms', []))}"
+        f" (públicos + {show(uia_lib.SANITIZATION_LOCAL)} si existe)")
+  total = 0
+  for root in cfg["watchRoots"]:
+    base = Path(os.path.expanduser(root["path"]))
+    if not base.is_dir():
+      print(f"  [falta] {root['id']:<28} {base}")
+      continue
+    n = sum(1 for _ in iter_candidates(root, cfg))
+    total += n
+    print(f"  [ok]    {root['id']:<28} {base}  ->  {n} archivos ({root.get('category', 'projects')}, profundidad {root.get('maxDepth', 5)})")
+  print(f"Total: {total} archivos candidatos. No se escribió nada.")
+  return 0
 
-  sources_path = LOCAL_SOURCES if LOCAL_SOURCES.exists() else EXAMPLE_SOURCES
-  sources_cfg = load_json(sources_path, {"watchRoots": []})
-  state_cfg = load_json(LOCAL_STATE, {"schemaVersion": "1.0.0", "scannedFiles": {}})
-  sanitization_cfg = load_json(SANITIZATION_SCHEMA, {"forbiddenClientTerms": []})
 
-  client_regexes = [
-      re.compile(rf"\b{pat}\b", re.IGNORECASE)
-      for pat in sanitization_cfg.get("forbiddenClientTerms", [])
-  ]
+def harvest(cfg: dict, mark_processed: bool) -> int:
+  rules = uia_lib.load_sanitization_rules()
+  regexes = uia_lib.client_term_regexes(rules)
+  state = json.loads(LOCAL_STATE.read_text(encoding="utf-8")) if LOCAL_STATE.exists() else {"scannedFiles": {}}
+  previous = state.get("scannedFiles", {})
+  current = scan_watch_roots(cfg, warn=lambda m: print(m, file=sys.stderr))
 
-  previous_files: dict[str, dict] = state_cfg.get("scannedFiles", {})
-  current_files = scan_watch_roots(sources_cfg)
-
-  new_items = []
-  modified_items = []
-  unchanged_count = 0
-
-  for fpath_str, meta in sorted(current_files.items()):
-    prev = previous_files.get(fpath_str)
+  new_items, modified_items, unchanged = [], [], 0
+  for fpath, meta in sorted(current.items()):
+    prev = previous.get(fpath)
     if prev is None:
-      new_items.append((fpath_str, meta))
+      new_items.append((fpath, meta))
     elif prev.get("sha256") != meta["sha256"]:
-      modified_items.append((fpath_str, meta))
+      modified_items.append((fpath, meta))
     else:
-      unchanged_count += 1
+      unchanged += 1
 
-  today_str = datetime.now().strftime("%Y-%m-%d")
-  inbox_dir = HARVESTER_DIR / "inbox" / today_str
-  inbox_dir.mkdir(parents=True, exist_ok=True)
-  report_path = inbox_dir / "harvest_report.md"
-
+  today = datetime.now().strftime("%Y-%m-%d")
+  inbox = HARVESTER_DIR / "inbox" / today
+  inbox.mkdir(parents=True, exist_ok=True)
+  report = inbox / "harvest_report.md"
   lines = [
-      f"# Reporte Incremental del Knowledge Harvester — {today_str}",
+      f"# Informe del Knowledge Harvester — {today}",
       "",
-      f"- **Archivos escaneados totales**: `{len(current_files)}`",
-      f"- **Archivos nuevos (`NEW`)**: `{len(new_items)}`",
-      f"- **Archivos modificados (`MODIFIED`)**: `{len(modified_items)}`",
-      f"- **Archivos sin cambios (`UNCHANGED`)**: `{unchanged_count}`",
+      f"- Archivos revisados: `{len(current)}`",
+      f"- Nuevos (`NEW`): `{len(new_items)}`",
+      f"- Modificados (`MODIFIED`): `{len(modified_items)}`",
+      f"- Sin cambios: `{unchanged}`",
       "",
-      "## 1. Candidatos Detectados (`NEW` y `MODIFIED`)",
+      "## 1. Candidatos (`NEW` y `MODIFIED`)",
       "",
-      "| Estado | Categoría | Raíz | Archivo Relativo | Términos de Cliente a Sanitizar |",
+      "| Estado | Categoría | Raíz | Archivo | Términos de cliente a sanear |",
       "| :--- | :--- | :--- | :--- | :--- |",
   ]
-
-  for status_label, group in [("NEW", new_items), ("MODIFIED", modified_items)]:
-    for fpath_str, meta in group[:250]:
-      flagged = check_client_terms(Path(fpath_str), client_regexes)
-      flag_str = ", ".join(flagged) if flagged else "Limpio"
-      lines.append(
-          f"| `{status_label}` | `{meta['category']}` | `{meta['rootId']}` | "
-          f"`{meta['relativePath']}` | {flag_str} |"
-      )
-
-  lines.extend([
+  for label, group in (("NEW", new_items), ("MODIFIED", modified_items)):
+    for fpath, meta in group[:250]:
+      flagged = client_terms_in(Path(fpath), regexes)
+      lines.append(f"| `{label}` | `{meta['category']}` | `{meta['rootId']}` | `{meta['relativePath']}` | {', '.join(flagged) or 'Limpio'} |")
+  lines += [
       "",
-      "## 2. Protocolo de Consolidación (CREATE / UPDATE / INVALIDATE)",
+      "## 2. Qué hacer con este informe",
       "",
-      "1. Revisa los archivos `NEW` y `MODIFIED` con el agente `knowledge-harvester`.",
-      "2. Abstrae cualquier término listado en la columna **Términos de Cliente a Sanitizar**.",
-      "3. Integra el conocimiento en `core/skills/`, `core/rules/` o `core/playbooks/`.",
-      "4. Ejecuta `python3 scripts/validate_and_build.py` y luego `python3 scripts/harvest.py --mark-processed`.",
-  ])
+      "1. Revisa los candidatos con el agente `knowledge-harvester` (modo hub).",
+      "2. Sanea todo término marcado en la última columna.",
+      "3. Lleva lo genérico a `core/skills/`, `core/rules/` o `core/playbooks/`.",
+      "4. `make check` y después `python3 scripts/harvest.py --mark-processed`.",
+  ]
+  report.write_text("\n".join(lines) + "\n", encoding="utf-8")
+  print(f"[OK] {len(current)} archivos ({len(new_items)} nuevos, {len(modified_items)} modificados, {unchanged} sin cambios).")
+  print(f"[OK] Informe: {show(report)}")
 
-  report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-  print(
-      f"[OK] Escaneo completado: {len(current_files)} archivos "
-      f"({len(new_items)} nuevos, {len(modified_items)} modificados, {unchanged_count} sin cambios)."
-  )
-  print(f"[OK] Reporte generado en: {report_path.relative_to(REPO_ROOT)}")
-
-  if args.mark_processed:
-    new_state = {
+  if mark_processed:
+    LOCAL_STATE.write_text(json.dumps({
         "schemaVersion": "1.0.0",
         "lastHarvestAt": datetime.now(tz=timezone.utc).isoformat(),
-        "scannedFiles": current_files,
-    }
-    LOCAL_STATE.write_text(
-        json.dumps(new_state, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
-    print(f"[OK] Estado incremental actualizado en: {LOCAL_STATE.relative_to(REPO_ROOT)}")
-
+        "scannedFiles": current,
+    }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"[OK] Estado guardado en {show(LOCAL_STATE)}")
   return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+  ap = argparse.ArgumentParser(description="Busca conocimiento nuevo en tus carpetas para universal-ide-agents.")
+  ap.add_argument("--config", help=f"Archivo de configuración (por defecto ${CONFIG_ENV} o harvester/sources.local.json).")
+  ap.add_argument("--init", "--init-local-config", dest="init", action="store_true", help="Crea harvester/sources.local.json desde el ejemplo.")
+  ap.add_argument("--check-config", action="store_true", help="Muestra qué carpetas y cuántos archivos leería, sin escribir nada.")
+  ap.add_argument("--mark-processed", action="store_true", help="Guarda el estado para que la próxima cosecha solo informe de cambios.")
+  args = ap.parse_args(argv)
+  if args.init:
+    return init_config()
+  path = config_path(args.config)
+  try:
+    cfg = load_config(path)
+  except ConfigError as exc:
+    print(f"[error] {exc}", file=sys.stderr)
+    return 2
+  if args.check_config:
+    return check_config(cfg, path)
+  return harvest(cfg, args.mark_processed)
 
 
 if __name__ == "__main__":

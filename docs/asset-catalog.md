@@ -13,7 +13,7 @@ Todos los activos de este catálogo tienen su fuente canónica en `core/` y son 
 | **Data Engineering** | `data-security-auditor` | Gobernanza criptográfica (`_PLAIN`, `_HASH`, `_ENCRYPTED`), MongoDB CSFLE (`crypt_shared`), protección PII y auditoría MCP/Docker. | Lectura y Análisis (`read`, `search`) |
 | **Data Engineering** | `pipeline-reviewer` | Revisor forense anti-falsos-positivos (`DEFECTO` / `CONDICIONAL` / `ENDURECIMIENTO` / `PROPUESTA`) con evidencia `[VERIFICADO]` vs `[INFERIDO]`. | Lectura y Análisis (`read`, `search`) |
 | **Data Engineering** | `pipeline-incident-triage` | Triaje inteligente de alertas y fallos de pipelines sobre OTel Spans, OpenLineage (*blast radius*) y MCP en modo read-only. | Lectura y Análisis (`read`, `search`) |
-| **Core Lifecycle** | `planner` | Planificación arquitectónica en `plans/registry.md` bajo el patrón *Research Before Implementation* y Parser V5. | Lectura y Planeación (`read`, `search`, `edit`) |
+| **Core Lifecycle** | `planner` | Planificación arquitectónica bajo el patrón *Research Before Implementation*; el plan va donde indique el `AGENTS.md` del proyecto. | Lectura y Planeación (`read`, `search`, `edit`) |
 | **Core Lifecycle** | `implementer` | Ejecución quirúrgica de planes aprobados, soporte `--dry-run`, escrituras `.tmp` y generación de walkthroughs. | Completo (`read`, `search`, `edit`, `execute`) |
 | **Core Lifecycle** | `code-reviewer` | Revisión de código general y de datos con citas `archivo:línea` y taxonomía estricta de 4 niveles. | Lectura y Análisis (`read`, `search`) |
 | **Core Lifecycle** | `docs-steward` | Gobernanza documental, sincronización de catálogos, CHANGELOG y diagramación estricta en SVG / tablas (cero Mermaid). | Documentación (`read`, `search`, `edit`) |

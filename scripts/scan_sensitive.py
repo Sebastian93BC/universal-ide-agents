@@ -24,6 +24,8 @@ import re
 import subprocess
 import sys
 
+import uia_lib
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RULES_FILE = REPO_ROOT / "harvester" / "schema" / "sanitization_rules.json"
 
@@ -47,15 +49,14 @@ BINARY_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".gz
 
 
 def load_rules() -> dict:
-  return json.loads(RULES_FILE.read_text(encoding="utf-8")) if RULES_FILE.exists() else {}
+  return uia_lib.load_sanitization_rules()
 
 
 def compile_patterns(rules: dict) -> list[tuple[str, re.Pattern]]:
   pats = [(name, re.compile(rx, flags)) for name, rx, flags in BUILTIN_PATTERNS]
   pats += [("credencial-en-uri", re.compile(rx)) for rx in rules.get("forbiddenSecretPatterns", [])]
   pats += [("ruta-personal", re.compile(rx)) for rx in rules.get("forbiddenPathPatterns", [])]
-  # El guion bajo separa palabras aquí: "proyectos_acme" contiene el término "acme".
-  pats += [("cliente", re.compile(rf"(?<![A-Za-z0-9]){rx}(?![A-Za-z0-9])", re.IGNORECASE)) for rx in rules.get("forbiddenClientTerms", [])]
+  pats += [("cliente", rx) for rx in uia_lib.client_term_regexes(rules)]
   return pats
 
 

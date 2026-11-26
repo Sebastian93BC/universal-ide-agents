@@ -8,7 +8,7 @@ Fuente única de agentes, skills, reglas, hook y plantillas MCP de ingeniería d
 - `python3 scripts/validate_and_build.py`: valida `core/` y compila hacia `.agents/`, `.claude/` y `.github/`. Con `--check-only` solo valida.
 - `scripts/deploy-to-project.sh --dry-run --profile data-eng-n8n /ruta/al/proyecto`: despliega en un proyecto (quita `--dry-run` para escribir). Después, `python3 scripts/check.py --project /ruta/al/proyecto`.
 - `python3 scripts/scan_sensitive.py`: escáner de datos sensibles.
-- `python3 scripts/harvest.py`: cosecha periódica de conocimiento (skill `knowledge-harvester`).
+- `python3 scripts/harvest.py --check-config` y después `python3 scripts/harvest.py`: cosecha de conocimiento desde las carpetas de `harvester/sources.local.json` (skill `knowledge-harvester`).
 
 ## Mapa
 
@@ -21,7 +21,8 @@ Fuente única de agentes, skills, reglas, hook y plantillas MCP de ingeniería d
 | `scripts/` | `uia_lib.py` (inventario y compilación compartidos), `validate_and_build.py`, `deploy.py`, `check.py`, `scan_sensitive.py`. |
 | `.agents/`, `.claude/`, `.github/{agents,skills,instructions}` | Compilado. No se editan a mano. |
 | `docs/` | Catálogo de activos, guía multi-IDE y contrato con la plantilla. |
-| `plans/` | Registro de tareas de este repositorio (`registry.md`) y su conocimiento. |
+| `harvester/` | Configuración del Knowledge Harvester; lo personal va en `*.local.json` (ignorado). |
+| `plans/` | Registro local de tareas de quien mantiene el repositorio. Git lo ignora: puede no existir en tu clon. |
 
 ## Reglas de este repositorio
 
@@ -31,9 +32,9 @@ Fuente única de agentes, skills, reglas, hook y plantillas MCP de ingeniería d
 4. **Sin Mermaid.** Diagramas en SVG (`docs/img/`) o tablas Markdown. Razón: el visor de Antigravity no los renderiza.
 5. **Evidencia antes de afirmar.** Cada hallazgo lleva `[VERIFICADO]` o `[INFERIDO]` y una clase: `DEFECTO`, `CONDICIONAL`, `ENDURECIMIENTO` o `PROPUESTA`.
 6. **Cada regla en `core/rules/` lleva un `trigger` válido** (`always_on`, `model_decision`, `glob`, `manual`). Razón: Antigravity descarta en silencio la que no lo tiene.
-7. **Planes en `plans/`.** Cada tarea mayor se registra en `plans/registry.md` (slug `AAAA-MM-DD-tema`) y su plan va en `plans/{slug}_plan.md`, con secciones `## `. Al cerrar, el plan pasa a `plans/historyPlans/`, el informe a `plans/walkthroughs/` y hay entrada en `CHANGELOG.md`. Ignora `TO_DO.md`.
+7. **Planes en `plans/` (local, nunca se versiona).** Cada tarea mayor se registra en `plans/registry.md` (slug `AAAA-MM-DD-tema`) y su plan va en `plans/{slug}_plan.md`, con secciones `## `. Al cerrar, el plan pasa a `plans/historyPlans/`, el informe a `plans/walkthroughs/` y hay entrada en `CHANGELOG.md`. Si `plans/` no existe, créalo. Ignora `TO_DO.md`.
 8. **Antes de cerrar una sesión con trabajo a medias**, deja la nota de traspaso en el plan activo (skill `session-handoff`).
-9. **JSON de configuración en `camelCase`.** Conserva `PREPROCESS_CONFIG` donde exista (ver `plans/knowledge/knowledge_base.md`).
+9. **JSON de configuración en `camelCase`.** Conserva `PREPROCESS_CONFIG` donde exista: los parsers heredados fallan sin esa clave en la raíz.
 
 ## Lo que cargan los IDE
 

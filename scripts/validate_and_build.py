@@ -47,24 +47,16 @@ def parse_frontmatter(text: str) -> dict[str, str]:
 
 
 def load_sanitization_rules() -> dict:
-  if not SCHEMA_FILE.exists():
-    return {
-        "platformLimits": {"antigravityMaxSkillChars": 12000},
-        "forbiddenClientTerms": [],
-        "forbiddenSecretPatterns": [],
-        "forbiddenPathPatterns": [],
-    }
-  return json.loads(SCHEMA_FILE.read_text(encoding="utf-8"))
+  rules = uia_lib.load_sanitization_rules()
+  rules.setdefault("platformLimits", {"antigravityMaxSkillChars": 12000})
+  return rules
 
 
 def validate_core_assets(rules: dict) -> tuple[list[str], dict[str, int]]:
   errors: list[str] = []
   max_chars = rules.get("platformLimits", {}).get("antigravityMaxSkillChars", 12000)
 
-  client_regexes = [
-      re.compile(rf"\b{pat}\b", re.IGNORECASE)
-      for pat in rules.get("forbiddenClientTerms", [])
-  ]
+  client_regexes = uia_lib.client_term_regexes(rules)
   secret_regexes = [
       re.compile(pat) for pat in rules.get("forbiddenSecretPatterns", [])
   ]
